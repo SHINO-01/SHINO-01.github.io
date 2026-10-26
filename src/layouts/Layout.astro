@@ -63,6 +63,7 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
 
     <div class="cursor" aria-hidden="true"><div class="cursor__ring"><i></i><i></i><i></i><i></i></div><div class="cursor__dot"></div></div>
     <div class="progress" aria-hidden="true"><i></i></div>
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
     <div class="grain" aria-hidden="true"></div>
 
     <slot name="chrome" />
@@ -149,6 +150,17 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
     pointer-events: none; overflow: visible; mix-blend-mode: difference;
     fill: none; stroke: var(--paper); stroke-width: 2.5;
   }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; z-index: 960;
+    padding: 12px 18px; max-width: calc(100vw - 32px);
+    background: var(--volt); color: var(--asphalt);
+    font-weight: 700; font-size: var(--t-sm);
+    clip-path: var(--chamfer); --cut: 10px;
+    translate: -50% 140%; opacity: 0; pointer-events: none;
+    transition: translate 0.45s var(--ease-out), opacity 0.3s;
+  }
+  .toast.is-on { translate: -50% 0; opacity: 1; }
 
   /* ───────────── Scroll progress + grain ───────────── */
   .progress { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 120; pointer-events: none; }

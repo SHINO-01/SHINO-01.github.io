@@ -27,6 +27,8 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
     <SectionHead id="missions-title" index={index} title={copy.title} kicker={copy.kicker} jp={copy.jp} />
 
     <div class="log-wrap" data-log>
+    <!-- one continuous speed-line field for the whole log; its focus follows the mission in view -->
+    <div class="mfield" aria-hidden="true"><SpeedLines tone="paper" follow="[data-mside-tag] .mside__num" class="mfield__lines" /></div>
     <div class="log__spine" aria-hidden="true"><i data-log-fill></i></div>
     <ol class="log">
       {experience.map((job, i) => {
@@ -66,7 +68,6 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
 
             {/* motion-graphic panel that fills the empty side of the timeline */}
             <div class="mside" aria-hidden="true" data-mside>
-              <SpeedLines fx={i % 2 ? 0.34 : 0.66} fy={0.2} class="mside__speed" />
               <span class="mside__year display" data-mside-year>{job.start.slice(0, 4)}</span>
               <div class="mside__hatch" data-mside-hatch>
                 <Ticker class="mside__ticker" reverse={i % 2 === 1} items={[job.company, `${yy(job.start)} — ${yy(job.end)}`, active ? 'In progress' : 'Mission cleared', job.location ?? '', ...job.stack].filter(Boolean)} />
@@ -115,6 +116,9 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
   }
 
   .log-wrap { position: relative; }
+  .mfield { position: absolute; top: -60px; bottom: -60px; left: calc(-1 * var(--bleed)); right: calc(-1 * var(--bleed)); z-index: 0; overflow: clip; pointer-events: none; }
+  .mfield :global(.mfield__lines) { position: sticky !important; top: 0; bottom: auto !important; height: 100vh !important; height: 100lvh !important; }
+  .log { z-index: 1; }
   .log { position: relative; display: grid; gap: clamp(28px, 4vw, 48px); padding: 0; list-style: none; }
   .log__spine { position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: var(--steel); }
   .log__spine i { position: absolute; inset: 0; background: var(--volt); transform-origin: top; transform: scaleY(var(--p, 1)); box-shadow: 0 0 24px rgb(215 255 31 / 0.5); }
@@ -179,9 +183,6 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
 
   /* ── side panels: ZZZ-style lime tag, hatched slab, film strip, giant year ── */
   .mside { position: relative; grid-row: 1; min-height: 420px; pointer-events: none; }
-  :global(.mside__speed) { inset: -30px 0 -10px !important; width: calc(100% + var(--bleed)) !important; height: calc(100% + 40px) !important; z-index: 0; }
-  .mission--l :global(.mside__speed) { left: auto !important; right: calc(-1 * var(--bleed)) !important; }
-  .mission--r :global(.mside__speed) { left: calc(-1 * var(--bleed)) !important; }
 
   :global(.mside__ticker) { position: absolute; bottom: 10px; color: var(--smoke); }
   .mission--l :global(.mside__ticker) { left: 100px; right: var(--bleed); }
@@ -249,7 +250,7 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
   .mission--r .mside__jp { right: 40px; }
 
   @media (max-width: 900px) {
-    .mside { display: none; }
+    .mside, .mfield { display: none; }
     .log__spine { left: 18px; }
     .mission { grid-template-columns: 1fr; gap: 0; padding-left: 52px; }
     .mission--l .mission__card, .mission--r .mission__card { grid-column: 1; }

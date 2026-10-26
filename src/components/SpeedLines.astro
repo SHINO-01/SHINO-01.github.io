@@ -4,10 +4,11 @@
  * converging on a focus point at ~12fps so they "boil" like hand-drawn frames.
  * fx / fy: focus point as a fraction of the box (0–1).
  */
-interface Props { fx?: number; fy?: number; tone?: 'paper' | 'ink' | 'volt'; class?: string }
-const { fx = 0.5, fy = 0.5, tone = 'paper', class: cls } = Astro.props;
+interface Props { fx?: number; fy?: number; tone?: 'paper' | 'ink' | 'volt'; class?: string; follow?: string }
+// follow: CSS selector; the focus glides to whichever match is nearest the middle of the screen
+const { fx = 0.5, fy = 0.5, tone = 'paper', class: cls, follow } = Astro.props;
 ---
-<canvas class:list={['speed', cls]} data-speed data-fx={fx} data-fy={fy} data-tone={tone} aria-hidden="true"></canvas>
+<canvas class:list={['speed', cls]} data-speed data-fx={fx} data-fy={fy} data-tone={tone} data-follow={follow} aria-hidden="true"></canvas>
 <style>
   .speed {
     position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;

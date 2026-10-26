@@ -8,6 +8,7 @@ export function initUI(lenis: Lenis | null, motion: boolean) {
   anchors(lenis);
   mobileMenu(lenis, motion);
   copyEmail();
+  copyOnClick();
   if (!motion) return;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   if (fine) {
@@ -150,6 +151,23 @@ function copyEmail() {
       }
       setTimeout(() => { label.textContent = original; }, 2200);
     });
+  });
+}
+
+/* Links with data-copy-text copy it (e.g. a Discord username) and still open their URL. */
+function copyOnClick() {
+  const toast = document.querySelector<HTMLElement>('[data-toast]');
+  let timer = 0;
+  document.addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement).closest<HTMLElement>('[data-copy-text]');
+    if (!a?.dataset.copyText) return;
+    const text = a.dataset.copyText;
+    navigator.clipboard?.writeText(text).catch(() => {});
+    if (!toast) return;
+    toast.textContent = `${a.dataset.copyLabel ?? ''} username "${text}" copied. Paste it into Add Friend.`.trim();
+    toast.classList.add('is-on');
+    clearTimeout(timer);
+    timer = window.setTimeout(() => toast.classList.remove('is-on'), 4200);
   });
 }
 

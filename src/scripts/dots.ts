@@ -17,6 +17,18 @@ type Tone = keyof typeof TONES;
 
 const mouse = { x: -9999, y: -9999 };
 
+/* Smooth 2D value noise (0–1), cheap enough to evaluate per dot per frame. */
+const BASE_PERM = [...Array(256).keys()].sort((a, b) => ((a * 7919 + 13) % 256) - ((b * 7919 + 13) % 256));
+const PERM = Uint8Array.from({ length: 512 }, (_, i) => BASE_PERM[i & 255]);
+const hash = (x: number, y: number) => PERM[(PERM[x & 255] + y) & 511] / 255;
+const smooth = (t: number) => t * t * (3 - 2 * t);
+function noise(x: number, y: number) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = smooth(x - xi), yf = smooth(y - yi);
+  const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+  return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+}
+
 export function initDots() {
   const layers = [...document.querySelectorAll<HTMLElement>('[data-dots]')];
   if (!layers.length) return;
@@ -37,6 +49,15 @@ function field(layer: HTMLElement) {
   let w = 0, h = 0, dpr = 1, running = false;
   // eased cursor position in canvas space, so the bloom trails the pointer slightly
   const p = { x: -9999, y: -9999 };
+  // click shockwaves travelling through the dot sizes (flow mode only)
+  const ripples: { x: number; y: number; t: number }[] = [];
+  if (base === 'flow') {
+    host.addEventListener('pointerdown', (e) => {
+      const c = canvas.getBoundingClientRect();
+      ripples.push({ x: e.clientX - c.left, y: e.clientY - c.top, t: performance.now() });
+      if (ripples.length > 4) ripples.shift();
+    });
+  }
 
   const size = () => {
     dpr = Math.min(devicePixelRatio || 1, 2);
@@ -59,7 +80,43 @@ function field(layer: HTMLElement) {
     const time = t * 0.0018;
     const waveW = w * 0.62;
 
-    if (base !== 'none' && tone.baseAlpha > 0) {
+    if (base === 'flow') {
+      // ether currents: dot size follows a domain-warped noise field drifting over time,
+      // tinted from grey toward violet where the current is strongest
+      const now = performance.now();
+      const ts = t * 0.00012;
+      const BUCKETS = 6;
+      const paths = Array.from({ length: BUCKETS }, () => new Path2D());
+      const ringPath = new Path2D();
+      const live = ripples.filter((r) => now - r.t < 1600);
+      for (let y = offset + GAP / 2; y < h; y += GAP) {
+        for (let x = GAP / 2; x < w; x += GAP) {
+          const q = noise(x * 0.0026 + ts * 2, y * 0.0026 - ts);
+          let v = noise(x * 0.0045 + q * 2.4 - ts * 3, y * 0.0045 + q * 1.6 + ts);
+          v = Math.max(0, Math.min(1, (v - 0.25) * 1.6));
+          let r = 0.5 + v * v * 3.4;
+          let bump = 0;
+          for (const rp of live) {
+            const age = now - rp.t;
+            const d = Math.hypot(x - rp.x, y - rp.y) - age * 0.75;
+            bump += Math.exp(-(d * d) / 900) * (1 - age / 1600);
+          }
+          r += bump * 6;
+          // dots riding a shockwave crest light up lime
+          const target = bump > 0.3 ? ringPath : paths[Math.min(BUCKETS - 1, Math.floor(v * BUCKETS))];
+          target.moveTo(x + r, y);
+          target.arc(x, y, r, 0, Math.PI * 2);
+        }
+      }
+      paths.forEach((path, b) => {
+        const k = b / (BUCKETS - 1);
+        const col = [139 + (143 - 139) * k, 141 + (99 - 141) * k, 152 + (255 - 152) * k].map(Math.round).join(',');
+        ctx.fillStyle = `rgba(${col},${0.1 + k * 0.4})`;
+        ctx.fill(path);
+      });
+      ctx.fillStyle = `rgba(${tone.hot},0.85)`;
+      ctx.fill(ringPath);
+    } else if (base !== 'none' && tone.baseAlpha > 0) {
       ctx.fillStyle = `rgba(${tone.base},${base === 'wave' ? 0.16 : tone.baseAlpha})`;
       ctx.beginPath();
       for (let y = offset + GAP / 2; y < h; y += GAP) {

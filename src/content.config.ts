@@ -64,7 +64,7 @@ export const collections = {
       rank: z.string().max(2),
       attribute: z.string(),
       faction: z.string(),
-      socials: z.array(link.extend({ icon: z.string() })).default([]),
+      socials: z.array(link.extend({ icon: z.string(), card: z.boolean().default(true), copy: z.string().optional() })).default([]),
     }),
   }),
   skills: defineCollection({

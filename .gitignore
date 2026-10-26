@@ -6,3 +6,4 @@ dist/
 .claude/
 .playwright-mcp/
 .impeccable/hook.cache.json
+lab/

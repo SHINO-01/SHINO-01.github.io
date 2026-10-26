@@ -75,10 +75,27 @@ function navTracking(motion: boolean) {
 function heroScrollOut() {
   const h = $('[data-hero]');
   if (!h) return;
-  const tl = gsap.timeline({ scrollTrigger: { trigger: h, start: 'top top', end: 'bottom top', scrub: 0.6 } });
-  tl.to($('[data-hero-portrait]', h), { yPercent: 14, scale: 1.06, ease: 'none' }, 0)
-    .to($('.hero__copy', h), { yPercent: -30, opacity: 0.2, ease: 'none' }, 0)
+  // build only after the intro has finished, so the exit records the settled values
+  if (!document.documentElement.dataset.heroReady) {
+    addEventListener('hero:ready', () => { heroScrollOut(); ScrollTrigger.refresh(); }, { once: true });
+    return;
+  }
+  const cuts = $$('[data-hero-cut] > div', h);
+  const lines = $$('.hero__line > *', h);
+  // slice-cut exit: the portrait swaps to horizontal bands that slide apart in alternating
+  // directions, and each name line slides out its own way. Scrubbed, so it reverses on the way back.
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: h, start: 'top top', end: 'bottom top', scrub: 0.6,
+      onUpdate: (self) => h.classList.toggle('is-cut', self.progress > 0.015),
+    },
+  });
+  tl.to($('[data-hero-portrait]', h), { yPercent: 10, ease: 'none' }, 0)
+    .to(cuts, { x: (k: number) => (k % 2 ? 1 : -1) * (70 + k * 38), ease: 'power2.in' }, 0)
+    .to(lines, { x: (k: number) => (k % 2 ? 1 : -1) * 280, ease: 'power2.in' }, 0)
+    .to($('.hero__copy', h), { opacity: 0.35, ease: 'none' }, 0)
     .to($('[data-hero-slab]', h), { xPercent: 12, ease: 'none' }, 0)
+    .to($('[data-hero-jp]', h), { yPercent: -25, ease: 'none' }, 0)
     .to($('[data-hero-ghost]', h), { xPercent: -18, ease: 'none' }, 0)
     .to($('[data-hero-card]', h), { yPercent: -40, opacity: 0, ease: 'none' }, 0);
 }
@@ -202,7 +219,7 @@ function missions() {
       const dir = m.classList.contains('mission--l') ? 1 : -1;
       const tag = $('[data-mside-tag]', side)!;
       const numEl = $('[data-odometer]', side)!;
-      const speed = $('[data-speed]', side);
+      const speed = $('.mfield [data-speed]');
       tl.from($('[data-mside-hatch]', side), { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 0.1)
         .from(tag, { xPercent: 70 * dir, skewX: -18 * dir, opacity: 0, duration: 0.8, ease: 'expo.out' }, 0.2)
         .add(odometer(numEl, 0.55), 0.3)

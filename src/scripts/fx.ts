@@ -18,7 +18,9 @@ export function initSpeedLines() {
     const fx = Number(canvas.dataset.fx ?? 0.5);
     const fy = Number(canvas.dataset.fy ?? 0.5);
     const rgb = INK[(canvas.dataset.tone as keyof typeof INK) || 'paper'];
+    const follow = canvas.dataset.follow;
     let w = 0, h = 0, visible = false, last = 0, intensity = 0.55;
+    const focus = { x: -1, y: -1 };
 
     const size = () => {
       const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -29,13 +31,30 @@ export function initSpeedLines() {
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
-      const cx = w * fx, cy = h * fy;
+      let cx = w * fx, cy = h * fy;
+      if (follow) {
+        // aim at the followed element closest to the middle of the viewport, gliding between them
+        const c = canvas.getBoundingClientRect();
+        let best: DOMRect | null = null, bestD = Infinity;
+        document.querySelectorAll(follow).forEach((el) => {
+          const r = el.getBoundingClientRect();
+          const d = Math.abs(r.top + r.height / 2 - innerHeight * 0.45);
+          if (d < bestD) { bestD = d; best = r; }
+        });
+        if (best) {
+          const b = best as DOMRect;
+          const tx = b.left + b.width / 2 - c.left, ty = b.top + b.height / 2 - c.top;
+          if (focus.x < 0) { focus.x = tx; focus.y = ty; }
+          focus.x += (tx - focus.x) * 0.3; focus.y += (ty - focus.y) * 0.3;
+          cx = focus.x; cy = focus.y;
+        }
+      }
       const reach = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy));
       const count = 90;
       for (let i = 0; i < count; i++) {
         const a = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.06;
         // empty eye around the focus, lines start at a jittered radius
-        const r0 = reach * (0.2 + Math.random() * 0.22);
+        const r0 = follow ? 150 + Math.random() * 230 : reach * (0.2 + Math.random() * 0.22);
         const r1 = reach * 1.05;
         const spread = (0.004 + Math.random() * 0.012) * (0.6 + intensity);
         ctx.fillStyle = `rgba(${rgb},${(0.08 + Math.random() * 0.22) * intensity})`;

@@ -49,9 +49,9 @@ const year = new Date().getFullYear();
       <ul class="contact__socials">
         {p.socials.map((s) => (
           <li>
-            <a href={s.url} target="_blank" rel="noopener">
+            <a href={s.url} target="_blank" rel="noopener" data-copy-text={s.copy} data-copy-label={s.label}>
               <Icon name={s.icon} />
-              <span>{s.label}</span>
+              <span>{s.label}{s.copy && <span class="contact__handle"> · {s.copy}</span>}</span>
               <svg class="contact__ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
             </a>
           </li>
@@ -132,6 +132,7 @@ const year = new Date().getFullYear();
   .contact__socials a:hover { color: var(--volt); }
   .contact__socials a:hover > * { translate: 8px 0; }
   .contact__socials :global(svg) { width: 20px; height: 20px; }
+  .contact__handle { color: var(--smoke); font-weight: 500; }
   .contact__ext { width: 16px !important; height: 16px !important; color: var(--smoke); }
   .contact__langs { font-size: var(--t-sm); color: var(--smoke); }
 

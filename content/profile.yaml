@@ -41,6 +41,13 @@ attribute: Ether · AI systems
 faction: University of Wollongong
 
 # icon: any Simple Icons name (https://simpleicons.org) or "linkedin" / "mail".
+# card: false keeps a link out of the hero card (it still shows under Contact).
+# copy: text copied to the visitor's clipboard on click, with a confirmation toast.
+#
+# Discord: links can't target a username, so clicking copies your username and opens
+# Discord's friends page, where the visitor pastes it into "Add Friend".
+# To open your profile directly instead, set url to https://discord.com/users/<numeric ID>
+# (Settings → Advanced → Developer Mode, then right-click your name → Copy User ID).
 socials:
   - label: GitHub
     url: https://github.com/SHINO-01
@@ -48,6 +55,11 @@ socials:
   - label: LinkedIn
     url: https://www.linkedin.com/in/sakif-hussain
     icon: linkedin
+  - label: Discord
+    url: https://discord.com/channels/@me
+    icon: discord
+    copy: shino33
   - label: IEEE Xplore
     url: https://ieeexplore.ieee.org/document/10730626
     icon: ieee
+    card: false
