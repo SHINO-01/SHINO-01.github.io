@@ -9,17 +9,17 @@
 
 attributes:
   - name: AI agents & LLM systems
-    value: 92
+    value: 90
   - name: Backend & distributed systems
-    value: 88
+    value: 85
   - name: Infrastructure & DevOps
-    value: 80
+    value: 65
   - name: Data & databases
-    value: 82
+    value: 90
   - name: Frontend & product UI
-    value: 74
+    value: 58
   - name: Computer vision & research
-    value: 78
+    value: 85
 
 loadout:
   - slot: Languages
