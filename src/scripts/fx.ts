@@ -1,7 +1,7 @@
 /**
  * Motion-graphic effects shared across sections:
  *  - speed lines: anime concentration lines that "boil" at ~12fps
- *  - CRT: TV static that tunes in to the screen content when it scrolls into view
+ *  - waveform: a live signal line that ripples along the Contact status band
  * Everything only runs while on screen.
  */
 import gsap from 'gsap';
@@ -68,58 +68,53 @@ export function initSpeedLines() {
   });
 }
 
-/* ───────── CRT televisions ───────── */
-export function initCrts() {
-  document.querySelectorAll<HTMLElement>('[data-crt]').forEach((tv) => {
-    const canvas = tv.querySelector<HTMLCanvasElement>('[data-crt-noise]')!;
-    const ctx = canvas.getContext('2d')!;
-    const content = tv.querySelector<HTMLElement>('[data-crt-content]')!;
-    const roll = tv.querySelector<HTMLElement>('[data-crt-roll]')!;
-    const img = ctx.createImageData(canvas.width, canvas.height);
-    let visible = false, last = 0, tuned = false;
+/* ───────── signal waveform ───────── */
+export function initWaves() {
+  document.querySelectorAll<SVGSVGElement>('[data-wave]').forEach((svg) => {
+    const line = svg.querySelector<SVGPathElement>('[data-wave-line]')!;
+    const echo = svg.querySelector<SVGPathElement>('[data-wave-echo]')!;
+    let visible = false, last = 0, w = 0, h = 0;
+    // occasional bursts of a sharper, taller signal travelling along the line
+    const bursts: { x: number; life: number }[] = [];
 
-    const noise = () => {
-      const d = img.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = Math.random() * 255;
-        d[i] = d[i + 1] = d[i + 2] = v;
-        d[i + 3] = 255;
-      }
-      ctx.putImageData(img, 0, 0);
+    const size = () => {
+      w = svg.clientWidth; h = svg.clientHeight;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     };
-    const tick = (t: number) => {
+    const path = (t: number, phase: number, amp: number) => {
+      const mid = h / 2;
+      let d = '';
+      for (let x = 0; x <= w; x += 4) {
+        // envelope: quiet where it leaves the band, livelier to the right
+        const env = Math.min(1, x / 140) * (0.55 + 0.45 * Math.sin(x * 0.004 + t * 0.4));
+        let y = Math.sin(x * 0.035 - t * 3.2 + phase) * 0.55 + Math.sin(x * 0.011 + t * 1.3 + phase) * 0.45;
+        for (const b of bursts) {
+          const dx = x - b.x;
+          if (Math.abs(dx) < 60) y += Math.sin(dx * 0.35) * (1 - Math.abs(dx) / 60) * 2.2 * b.life;
+        }
+        d += `${x ? 'L' : 'M'}${x} ${(mid + y * amp * env).toFixed(1)}`;
+      }
+      return d;
+    };
+    const tick = (now: number) => {
       if (!visible) return;
-      if (t - last > 66) { noise(); last = t; }
+      if (now - last > 33) {
+        last = now;
+        const t = now / 1000;
+        if (Math.random() < 0.02) bursts.push({ x: 0, life: 1 });
+        for (let i = bursts.length - 1; i >= 0; i--) {
+          bursts[i].x += 9; bursts[i].life *= 0.985;
+          if (bursts[i].x > w + 60) bursts.splice(i, 1);
+        }
+        line.setAttribute('d', path(t, 0, h * 0.2));
+        echo.setAttribute('d', path(t - 0.18, 1.4, h * 0.3));
+      }
       requestAnimationFrame(tick);
     };
-
-    const tune = () => {
-      tuned = true;
-      gsap.timeline()
-        .set(canvas, { opacity: 0.95 })
-        .set(content, { opacity: 0 })
-        // flicker in, like a channel locking on
-        .to(content, { opacity: 1, duration: 0.05, repeat: 5, yoyo: true, ease: 'steps(1)' }, 0.45)
-        .fromTo(content, { scaleY: 0.05, scaleX: 1.3 }, { scaleY: 1, scaleX: 1, duration: 0.35, ease: 'expo.out' }, 0.45)
-        .to(content, { opacity: 1, duration: 0.01 })
-        .to(canvas, { opacity: 0.14, duration: 0.4 }, 0.6);
-    };
-
-    onScreen(tv, (v) => {
-      if (v && !visible) { visible = true; requestAnimationFrame(tick); if (!tuned) tune(); }
+    onScreen(svg, (v) => {
+      if (v && !visible) { size(); visible = true; requestAnimationFrame(tick); }
       else if (!v) visible = false;
     });
-
-    // rolling bar drifts down the screen every few seconds
-    gsap.to(roll, { top: '110%', duration: 2.4, ease: 'none', repeat: -1, repeatDelay: 2.6 });
-
-    // hovering knocks the signal out briefly
-    tv.addEventListener('pointerenter', () => {
-      gsap.timeline()
-        .to(canvas, { opacity: 0.9, duration: 0.05 })
-        .to(content, { x: 6, skewX: 20, duration: 0.05 }, 0)
-        .to(content, { x: 0, skewX: 0, duration: 0.2, ease: 'power3.out' })
-        .to(canvas, { opacity: 0.14, duration: 0.3 }, '<');
-    });
+    addEventListener('resize', () => visible && size());
   });
 }

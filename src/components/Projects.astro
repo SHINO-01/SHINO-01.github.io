@@ -3,7 +3,6 @@ import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import Chevrons from './Chevrons.astro';
-import SpeedLines from './SpeedLines.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
 import type { SiteCopy } from '../lib/data';
@@ -22,7 +21,10 @@ const stars = { S: 5, A: 4, B: 3 } as const;
     <div class="projects__track" data-proj-track>
       <div class="projects__intro">
         <SectionHead id="projects-title" index={index} title={copy.title} kicker={copy.kicker} tone="light" jp={copy.jp} />
-        <SpeedLines fx={0.32} fy={0.42} tone="ink" class="projects__speed" />
+        <!-- hexagonal shockwaves pulsing out from behind the heading -->
+        <svg class="projects__pulse" viewBox="-300 -300 600 600" aria-hidden="true" data-pulse>
+          {Array.from({ length: 5 }).map(() => <path d="M0-100 87-50v100L0 100-87 50v-100Z" />)}
+        </svg>
         <p class="projects__lede">{copy.lede}</p>
         <div class="projects__conveyor" data-proj-slab>
           <Chevrons dir="right" label={copy.scrollHint} />
@@ -110,10 +112,11 @@ const stars = { S: 5, A: 4, B: 3 } as const;
   }
 
   .projects__intro { position: relative; }
-  .projects__intro :global(.projects__speed) {
-    top: -160px !important; left: calc(-1 * var(--gutter)) !important;
-    width: calc(100% + var(--gutter) + 120px) !important; height: calc(100% + 320px) !important; z-index: -1;
+  .projects__pulse {
+    position: absolute; left: -130px; top: -190px; z-index: -1;
+    width: 520px; height: 520px; overflow: visible; pointer-events: none;
   }
+  .projects__pulse path { fill: none; stroke: var(--asphalt); stroke-width: 2; vector-effect: non-scaling-stroke; opacity: 0; }
   .projects__conveyor {
     position: relative; margin-top: 34px; margin-left: calc(-1 * var(--gutter));
     width: calc(100% + var(--gutter) + 40px);
@@ -247,7 +250,8 @@ const stars = { S: 5, A: 4, B: 3 } as const;
     .projects__track { flex-direction: column; align-items: stretch; width: auto; padding-top: 100px; }
     .projects__intro, .pcard, .projects__more { width: 100%; }
     .projects__more { aspect-ratio: auto; min-height: 200px; }
-    .phud, .projects__conveyor, .projects__intro :global(.projects__speed) { display: none; }
+    .phud, .projects__conveyor { display: none; }
+    .projects__pulse { left: -160px; top: -200px; }
     .projects__word { font-size: 9rem; bottom: auto; top: 60px; }
   }
 </style>

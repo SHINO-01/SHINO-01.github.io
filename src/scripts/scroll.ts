@@ -207,8 +207,11 @@ function missions() {
         .from(tag, { xPercent: 70 * dir, skewX: -18 * dir, opacity: 0, duration: 0.8, ease: 'expo.out' }, 0.2)
         .add(odometer(numEl, 0.55), 0.3)
         .add(() => impact(tag, side, speed), 0.86)
-        .from($('.chev', side), { scaleX: 0, transformOrigin: dir > 0 ? 'left center' : 'right center', duration: 0.6, ease: 'expo.out' }, 0.5)
-        .from($('[data-crt]', side), { y: 50, rotate: -14 * dir, opacity: 0, duration: 0.7, ease: 'back.out(2)' }, 0.6)
+        // lock-on: rings expand, brackets close in from wide, then the mark decodes
+        .from($('[data-lock-rings]', side), { scale: 0.2, rotate: -90, opacity: 0, svgOrigin: '0 0', duration: 0.9, ease: 'expo.out' }, 0.45)
+        .from($('[data-lock-brackets]', side), { scale: 2.2, opacity: 0, svgOrigin: '0 0', duration: 0.5, ease: 'power4.in' }, 0.6)
+        .to($('[data-lock-mark]', side), { duration: 0.6, scrambleText: { text: $('[data-lock-mark]', side)!.dataset.text || '', chars: '01#%&@$', speed: 0.7 } }, 1.05)
+        .from($('.lock__dates', side), { opacity: 0, duration: 0.3 }, 1.4)
         .from($('.mside__jp', side), { opacity: 0, y: 12, duration: 0.5 }, 0.7);
       gsap.fromTo($('[data-mside-year]', side), { yPercent: 35 }, {
         yPercent: -35, ease: 'none',
@@ -227,6 +230,15 @@ function projects() {
   const cards = $$('[data-pcard]', sec);
   const mm = gsap.matchMedia();
 
+  // hexagonal shockwaves: each hex expands and fades, staggered into a continuous pulse
+  const hexes = $$('[data-pulse] path', sec);
+  if (hexes.length) {
+    const pulse = gsap.timeline({ repeat: -1, paused: true });
+    hexes.forEach((hx, k) => {
+      pulse.fromTo(hx, { scale: 0.15, opacity: 0.7, rotate: -30, svgOrigin: '0 0' }, { scale: 2.8, opacity: 0, rotate: 0, duration: 3.6, ease: 'power2.out' }, k * 0.72);
+    });
+    ScrollTrigger.create({ trigger: sec, start: 'top bottom', end: 'bottom top', onToggle: (self) => (self.isActive ? pulse.play() : pulse.pause()) });
+  }
   const word = $('[data-proj-word]', sec);
   const marks = $$('[data-proj-mark]', sec);
   const slab = $('[data-proj-slab]', sec);
@@ -266,9 +278,7 @@ function projects() {
       });
     }
     if (slab) {
-      gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top 60%', once: true } })
-        .from(slab, { scaleX: 0, duration: 0.9, ease: 'expo.out' })
-        .add(() => $('.projects__speed', sec)?.dispatchEvent(new Event('speed:punch')), 0.2);
+      gsap.from(slab, { scaleX: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: { trigger: sec, start: 'top 60%', once: true } });
     }
     cards.forEach((c) => {
       gsap.from(c, {
@@ -321,7 +331,7 @@ function contact() {
     gsap.timeline({ scrollTrigger: { trigger: status, start: 'top 90%', once: true } })
       .from($('[data-cstatus-hatch]', status), { scaleX: 0, duration: 0.8, ease: 'expo.out' })
       .from($('[data-cstatus-tag]', status), { xPercent: -100, duration: 0.9, ease: 'expo.out' }, 0.1)
-      .from($('[data-crt]', status), { y: 60, rotate: 20, opacity: 0, duration: 0.8, ease: 'back.out(2)' }, 0.35);
+      .from($('[data-wave]', status), { clipPath: 'inset(0 100% 0 0)', duration: 1.1, ease: 'power3.inOut' }, 0.4);
   }
   gsap.from($$('.contact__lede, .mailbox, .contact__row, .contact__socials li, .contact__langs', sec), {
     scrollTrigger: { trigger: $('.contact__inner', sec), start: 'top 75%', once: true },

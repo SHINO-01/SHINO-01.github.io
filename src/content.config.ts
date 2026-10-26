@@ -40,7 +40,7 @@ export const collections = {
       missions: heading,
       projects: heading.extend({ lede: z.string(), moreTitle: z.string(), moreText: z.string(), scrollHint: z.string().default('Scroll to browse'), banner: z.array(z.string()).min(1) }),
       records: heading.extend({ achievementsLabel: z.string(), trainingLabel: z.string(), paperCta: z.string() }),
-      contact: z.object({ heading: z.string(), lede: z.string(), marquee: z.string(), statusLabel: z.string().default('Status'), statusScreen: z.string().default('Open'), banner: z.array(z.string()).min(1) }),
+      contact: z.object({ heading: z.string(), lede: z.string(), marquee: z.string(), statusLabel: z.string().default('Status'), banner: z.array(z.string()).min(1) }),
       boot: z.array(z.string()).min(1),
       footer: z.string(),
     }),

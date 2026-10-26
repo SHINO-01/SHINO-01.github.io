@@ -55,8 +55,6 @@ contact:
   marquee: Let's build something
   # Label on the lime availability band (shown only when profile availability.open is true).
   statusLabel: Status
-  # Short word shown on the little TV next to the band.
-  statusScreen: Open
   banner: [Thanks for visiting]
 
 # Lines shown on the loading screen, in order.

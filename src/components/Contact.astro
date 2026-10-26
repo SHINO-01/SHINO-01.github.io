@@ -1,8 +1,6 @@
 ---
 import Icon from './Icon.astro';
 import Dots from './Dots.astro';
-import Crt from './Crt.astro';
-import Ticker from './Ticker.astro';
 import Tape from './Tape.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
@@ -65,17 +63,16 @@ const year = new Date().getFullYear();
 
   {p.availability.open && (
     <div class="cstatus" aria-hidden="true" data-cstatus>
-      <div class="cstatus__hatch" data-cstatus-hatch>
-        <Ticker class="cstatus__ticker" items={[p.availability.label, p.location, p.email, ...p.roles]} />
-      </div>
+      <div class="cstatus__hatch" data-cstatus-hatch></div>
+      <!-- live signal waveform transmitting from the status band -->
+      <svg class="cstatus__wave" preserveAspectRatio="none" data-wave>
+        <path class="cstatus__wave-echo" data-wave-echo />
+        <path class="cstatus__wave-line" data-wave-line />
+      </svg>
       <div class="cstatus__tag" data-cstatus-tag>
         <span class="cstatus__label"><i></i>{copy.statusLabel}</span>
         <span class="cstatus__text display">{p.availability.label}</span>
       </div>
-      <Crt channel="ON" class="cstatus__crt">
-        <span class="cstatus__rec"><i></i>Rec</span>
-        <span class="cstatus__screen">{copy.statusScreen}</span>
-      </Crt>
     </div>
   )}
 
@@ -159,11 +156,10 @@ const year = new Date().getFullYear();
   .cstatus__label i { width: 10px; height: 10px; border-radius: 50%; background: var(--asphalt); animation: blink 1.2s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0.2; } }
   .cstatus__text { font-size: clamp(0.95rem, 1.35vw, 1.3rem); line-height: 1.1; }
-  :global(.cstatus__ticker) { position: absolute; left: max(var(--gutter), calc((100vw - 1320px) / 2 + var(--gutter))); right: 90px; bottom: 4px; color: var(--smoke); }
-  :global(.cstatus__crt) { position: absolute; left: min(58vw, 930px); top: -54px; width: 168px; rotate: 5deg; pointer-events: auto; }
-  .cstatus__screen { font-size: 1.9rem; text-transform: uppercase; }
-  .cstatus__rec { display: inline-flex; align-items: center; gap: 5px; font-family: var(--f-ui); font-weight: 700; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--paper); text-shadow: none; }
-  .cstatus__rec i { width: 7px; height: 7px; border-radius: 50%; background: var(--hazard); animation: blink 1s steps(1) infinite; }
+  .cstatus__wave { position: absolute; left: min(46vw, 740px); top: 0; width: calc(100% - min(46vw, 740px)); height: 74px; overflow: visible; }
+  .cstatus__wave path { fill: none; vector-effect: non-scaling-stroke; }
+  .cstatus__wave-line { stroke: var(--volt); stroke-width: 2.2; }
+  .cstatus__wave-echo { stroke: rgb(241 240 234 / 0.28); stroke-width: 1.2; }
   .footer {
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
     padding: 22px var(--gutter) 28px; border-top: 1px solid var(--steel);
@@ -174,7 +170,7 @@ const year = new Date().getFullYear();
 
   @media (max-width: 960px) {
     .cstatus { height: auto; margin: 0 0 24px; }
-    .cstatus__hatch, .cstatus :global(.cstatus__crt) { display: none; }
+    .cstatus__hatch, .cstatus__wave { display: none; }
     .cstatus__tag { position: relative; width: 94%; height: auto; padding: 16px 70px 16px var(--gutter); flex-wrap: wrap; gap: 4px 14px; }
     .contact__inner { grid-template-columns: 1fr; }
     .contact__tab { display: none; }

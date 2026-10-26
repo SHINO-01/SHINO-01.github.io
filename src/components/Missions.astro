@@ -2,8 +2,6 @@
 import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import Icon from './Icon.astro';
-import Crt from './Crt.astro';
-import Chevrons from './Chevrons.astro';
 import Ticker from './Ticker.astro';
 import SpeedLines from './SpeedLines.astro';
 import { fmtMonth, duration } from '../lib/data';
@@ -77,11 +75,21 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
                 <span class="mside__label">Mission</span>
                 <span class="mside__num display" data-odometer={num}>{num}</span>
               </div>
-              <Crt channel={num} class="mside__crt">
-                <span class="mside__crt-mark">{mark(job.company)}</span>
-                <span class="mside__crt-dates">{yy(job.start)}–{yy(job.end)}</span>
-              </Crt>
-              <Chevrons dir={i % 2 ? 'right' : 'left'} class="mside__chev" />
+              <svg class="lock" viewBox="-100 -100 200 200" data-lock>
+                <g data-lock-rings>
+                <circle class="lock__ring lock__ring--a" r="86" />
+                <circle class="lock__ring lock__ring--b" r="68" />
+                <g class="lock__ticks">
+                  {Array.from({ length: 48 }).map((_, k) => <line y1={-92} y2={k % 4 ? -96 : -100} transform={`rotate(${k * 7.5})`} />)}
+                </g>
+                <g class="lock__sweep"><path d="M0 0 0-86A86 86 0 0 1 61-61Z" /></g>
+                </g>
+                <g class="lock__brackets" data-lock-brackets>
+                  <path d="M-58-40v-18h18" /><path d="M58-40v-18h-18" /><path d="M-58 40v18h18" /><path d="M58 40v18h-18" />
+                </g>
+                <text class="lock__mark" y="8" data-lock-mark data-text={mark(job.company)}>{mark(job.company)}</text>
+                <text class="lock__dates" y="30">{yy(job.start)}–{yy(job.end)}</text>
+              </svg>
               <span class="mside__jp">{active ? '任務進行中' : '任務完了'}</span>
             </div>
           </li>
@@ -179,15 +187,23 @@ const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.s
   .mission--l :global(.mside__ticker) { left: 100px; right: var(--bleed); }
   .mission--r :global(.mside__ticker) { right: 100px; left: var(--bleed); }
 
-  :global(.mside__crt) { position: absolute; top: 158px; width: 176px; z-index: 4; pointer-events: auto; }
-  .mission--l :global(.mside__crt) { left: 74px; rotate: -4deg; }
-  .mission--r :global(.mside__crt) { right: 74px; rotate: 4deg; }
-  .mside__crt-mark { font-size: 2.3rem; }
-  .mside__crt-dates { font-family: var(--f-ui); font-weight: 700; font-size: 0.62rem; letter-spacing: 0.14em; color: var(--paper); text-shadow: none; }
 
-  :global(.mside__chev) { position: absolute; top: 312px; width: 64%; z-index: 3; }
-  .mission--l :global(.mside__chev) { left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%); }
-  .mission--r :global(.mside__chev) { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 22px 100%); }
+
+  /* lock-on reticle: counter-rotating rings, a radar sweep and brackets that snap shut */
+  .lock { position: absolute; top: 196px; width: 200px; height: 200px; z-index: 4; overflow: visible; }
+  .mission--l .lock { left: 64px; }
+  .mission--r .lock { right: 64px; }
+  .lock__ring { fill: none; stroke: rgb(241 240 234 / 0.5); stroke-width: 1.5; transform-box: view-box; transform-origin: 0 0; } /* (0,0) is the reticle centre */
+  .lock__ring--a { stroke-dasharray: 3 7; animation: lock-spin 22s linear infinite; }
+  .lock__ring--b { stroke: var(--volt); stroke-width: 2; stroke-dasharray: 60 14 8 14; animation: lock-spin 9s linear infinite reverse; }
+  .lock__ticks line { stroke: rgb(241 240 234 / 0.35); stroke-width: 1.5; }
+  .lock__sweep { animation: lock-spin 3.2s linear infinite; transform-box: view-box; transform-origin: 0 0; }
+  .lock__sweep path { fill: rgb(215 255 31 / 0.14); }
+  .lock__brackets path { fill: none; stroke: var(--volt); stroke-width: 3; }
+  .lock__mark { font-family: var(--f-display); font-size: 34px; fill: var(--paper); text-anchor: middle; }
+  .lock__dates { font-family: var(--f-ui); font-weight: 700; font-size: 10px; letter-spacing: 0.16em; fill: var(--smoke); text-anchor: middle; }
+  @keyframes lock-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .lock__ring, .lock__sweep { animation: none; } }
 
   .mside__tag.is-impact { background: var(--asphalt); color: var(--volt); }
   .mission--l .mside { grid-column: 2; }
