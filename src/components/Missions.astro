@@ -113,7 +113,7 @@ const { experience, index } = Astro.props;
   .mission__role { font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.02; }
   .mission__time { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0 18px; font-weight: 600; font-size: var(--t-sm); }
   .mission__arrow { width: 22px; height: 2px; background: var(--paper); position: relative; }
-  .mission__arrow::after { content: ''; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left: 6px solid var(--paper); border-right: 0; }
+  .mission__arrow::after { content: ''; position: absolute; right: -1px; top: -3px; width: 6px; height: 8px; background: var(--paper); clip-path: polygon(0 0, 100% 50%, 0 100%); }
   .mission__dur { color: var(--asphalt); background: var(--paper); padding: 1px 8px; font-size: var(--t-xs); font-weight: 700; }
   .mission__list { display: grid; gap: 10px; color: #cfcfc8; }
   .mission__list li { position: relative; padding-left: 22px; max-width: 62ch; }
