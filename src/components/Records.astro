@@ -3,13 +3,15 @@ import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import { fmtMonth } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
+import type { SiteCopy } from '../lib/data';
 
 interface Props {
   education: CollectionEntry<'education'>['data'][];
   publications: CollectionEntry<'publications'>['data'][];
+  copy: SiteCopy['records'];
   index: string;
 }
-const { education, publications, index } = Astro.props;
+const { education, publications, copy, index } = Astro.props;
 const CIRC = 2 * Math.PI * 52;
 // deterministic barcode from a string
 const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c) => (c.charCodeAt(0) % 3) + 1);
@@ -17,11 +19,11 @@ const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c
 <section class="records" id="records" aria-labelledby="records-title">
   <Dots tone="light" />
   <div class="records__inner">
-    <SectionHead id="records-title" index={index} title="Records" kicker="Education and published research" tone="light" jp="記録" />
+    <SectionHead id="records-title" index={index} title={copy.title} kicker={copy.kicker} tone="light" jp={copy.jp} />
 
     <div class="records__grid">
       <div class="records__col">
-        <h3 class="records__label">Achievements</h3>
+        <h3 class="records__label">{copy.achievementsLabel}</h3>
         {publications.map((pub) => (
           <article class="trophy" data-trophy>
             <div class="trophy__banner"><span>Achievement unlocked</span><span>{pub.year}</span></div>
@@ -43,7 +45,7 @@ const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c
                 <ul class="trophy__list">{pub.highlights.map((h) => <li>{h}</li>)}</ul>
                 {pub.url && (
                   <a class="btn trophy__link" href={pub.url} target="_blank" rel="noopener">
-                    <span>Read the paper</span>
+                    <span>{copy.paperCta}</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
                   </a>
                 )}
@@ -55,7 +57,7 @@ const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c
       </div>
 
       <div class="records__col">
-        <h3 class="records__label">Training</h3>
+        <h3 class="records__label">{copy.trainingLabel}</h3>
         <ol class="ids">
           {education.map((ed) => {
             const ongoing = ed.end === 'present';

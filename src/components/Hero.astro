@@ -4,8 +4,9 @@ import Icon from './Icon.astro';
 import Dots from './Dots.astro';
 import type { CollectionEntry } from 'astro:content';
 
-interface Props { profile: CollectionEntry<'profile'>['data'] }
-const { profile: p } = Astro.props;
+import type { SiteCopy } from '../lib/data';
+interface Props { profile: CollectionEntry<'profile'>['data']; copy: SiteCopy['hero'] }
+const { profile: p, copy } = Astro.props;
 const longest = Math.max(...p.nameLines.map((l) => l.length));
 ---
 <section class="hero" id="agent" aria-labelledby="hero-name" data-hero>
@@ -26,7 +27,7 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
 
       <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
         <path transform="translate(120 0) scale(-1 1)" d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
-        <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">hi!</text>
+        <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">{copy.sticker}</text>
       </svg>
       <div class="hero__slices" data-hero-slices>
         {Array.from({ length: 6 }).map(() => <div style={`background-image:url(${asset(p.portrait.main)})`}></div>)}
@@ -39,14 +40,14 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
       <g fill="var(--asphalt)">
         {[0,3,5,9,11,12,16,19,21,24,27,28,31,34,36,38].map((x, i) => <rect x={12 + x * 2.6} y="11" width={i % 3 === 0 ? 3.4 : 1.8} height="24" />)}
       </g>
-      <text x="12" y="45" font-family="Chakra Petch" font-weight="700" font-size="8" fill="var(--asphalt)">SHN-0001 // CLEARANCE {p.rank}</text>
+      <text x="12" y="45" font-family="Chakra Petch" font-weight="700" font-size="8" fill="var(--asphalt)">{copy.badgeCode} // CLEARANCE {p.rank}</text>
       <rect x="112" y="11" width="26" height="24" fill="var(--volt)" stroke="var(--asphalt)" stroke-width="3" />
     </svg>
   </div>
 
   <div class="hero__copy">
     <p class="hero__file" data-hero-in>
-      <span class="hero__file-tag">Agent file</span>
+      <span class="hero__file-tag">{copy.fileTag}</span>
       <span>{p.title}</span>
     </p>
     <h1 class="hero__name display" id="hero-name" aria-label={p.name} style={`--len:${longest}`}>
@@ -59,10 +60,10 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
     <p class="hero__tagline" data-hero-in>{p.tagline}</p>
     <div class="hero__ctas" data-hero-in>
       <a class="btn" href="#projects" data-magnetic>
-        <span>See projects</span>
+        <span>{copy.primaryCta}</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
       </a>
-      <a class="btn btn--ghost" href="#contact" data-magnetic><span>Get in touch</span></a>
+      <a class="btn btn--ghost" href="#contact" data-magnetic><span>{copy.secondaryCta}</span></a>
     </div>
   </div>
 

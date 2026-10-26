@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────
+#  SITE COPY — navigation labels, section headings, banners and
+#  other text that isn't about a specific job or project.
+#  `jp` is the large decorative Japanese text behind each heading.
+#  In contact.lede, {location} is replaced with your profile location.
+# ─────────────────────────────────────────────────────────────
+
+nav:
+  agent: Agent
+  loadout: Loadout
+  missions: Missions
+  projects: Projects
+  records: Records
+  contact: Contact
+
+hero:
+  fileTag: Agent file
+  primaryCta: See projects
+  secondaryCta: Get in touch
+  sticker: hi!
+  badgeCode: SHN-0001
+
+loadout:
+  title: Loadout
+  kicker: Skills and the tools I reach for
+  jp: 装備
+
+missions:
+  title: Mission log
+  kicker: Where I've worked and what I shipped
+  jp: 任務
+
+projects:
+  title: Projects
+  kicker: Things I've designed, built and shipped
+  jp: 作品
+  lede: Open-source frameworks, a product on the Chrome Web Store and distributed systems built to survive outages.
+  moreTitle: More on GitHub
+  moreText: Experiments, coursework and works in progress
+  # The orange banner above the section.
+  banner: [Projects, Open source, Shipped to production]
+
+records:
+  title: Records
+  kicker: Education and published research
+  jp: 記録
+  achievementsLabel: Achievements
+  trainingLabel: Training
+  paperCta: Read the paper
+
+contact:
+  heading: Got a role or a project in mind?
+  lede: I'm based in {location} and open to AI engineering and software engineering work, on-site or remote. The fastest way to reach me is email.
+  marquee: Let's build something
+  # Label on the lime availability band (shown only when profile availability.open is true).
+  statusLabel: Status
+  banner: [Thanks for visiting]
+
+# Lines shown on the loading screen, in order.
+boot: [Linking agent profile, Syncing mission log, Calibrating loadout, Decrypting project files, Agent ready]
+
+footer: Built with Astro and GSAP. Hosted on GitHub Pages.

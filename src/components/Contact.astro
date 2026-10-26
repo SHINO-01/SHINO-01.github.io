@@ -4,9 +4,10 @@ import Dots from './Dots.astro';
 import Tape from './Tape.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
+import type { SiteCopy } from '../lib/data';
 
-interface Props { profile: CollectionEntry<'profile'>['data']; index: string }
-const { profile: p, index } = Astro.props;
+interface Props { profile: CollectionEntry<'profile'>['data']; copy: SiteCopy['contact']; footer: string; index: string }
+const { profile: p, copy, footer, index } = Astro.props;
 const year = new Date().getFullYear();
 ---
 <section class="contact" id="contact" aria-labelledby="contact-title">
@@ -14,7 +15,7 @@ const year = new Date().getFullYear();
   <div class="contact__marquee" aria-hidden="true" data-marquee>
     <div class="contact__marquee-track" data-marquee-track>
       {[0, 1].map(() => (
-        <span class="contact__marquee-run display">Let's build something <i>✦</i> Let's build something <i>✦</i> </span>
+        <span class="contact__marquee-run display">{copy.marquee} <i>✦</i> {copy.marquee} <i>✦</i> </span>
       ))}
     </div>
   </div>
@@ -22,11 +23,8 @@ const year = new Date().getFullYear();
   <div class="contact__inner">
     <div class="contact__tab display" aria-hidden="true">{index}</div>
     <div class="contact__copy">
-      <h2 class="contact__title display" id="contact-title" data-split>Got a role or a project in mind?</h2>
-      <p class="contact__lede">
-        I'm based in {p.location} and open to AI engineering and software engineering work, on-site or remote.
-        The fastest way to reach me is email.
-      </p>
+      <h2 class="contact__title display" id="contact-title" data-split>{copy.heading}</h2>
+      <p class="contact__lede">{copy.lede.replace('{location}', p.location)}</p>
     </div>
 
     <div class="contact__actions">
@@ -63,11 +61,22 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <div class="contact__tape"><Tape items={['Thanks for visiting', p.codename, p.title]} tone="ether" angle={-2} /></div>
+  {p.availability.open && (
+    <div class="cstatus" aria-hidden="true" data-cstatus>
+      <div class="cstatus__hatch" data-cstatus-hatch></div>
+      <div class="cstatus__tag" data-cstatus-tag>
+        <span class="cstatus__label"><i></i>{copy.statusLabel}</span>
+        <span class="cstatus__text display">{p.availability.label}</span>
+      </div>
+      <div class="cstatus__film" data-cstatus-film><div class="cstatus__film-track">{Array.from({ length: 30 }).map(() => <i />)}</div></div>
+    </div>
+  )}
+
+  <div class="contact__tape"><Tape items={[...copy.banner, p.codename, p.title]} tone="ether" angle={-2} /></div>
 
   <footer class="footer">
     <span>© {year} {p.name}</span>
-    <span>Built with Astro and GSAP. Hosted on GitHub Pages.</span>
+    <span>{footer}</span>
     <a href="#agent" class="footer__top" data-scramble>Back to top</a>
   </footer>
   <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
@@ -123,6 +132,33 @@ const year = new Date().getFullYear();
   .contact__langs { font-size: var(--t-sm); color: var(--smoke); }
 
   .contact__tape { padding: 20px 0 30px; }
+
+  /* availability band: bleeds off the left edge under the copy */
+  .cstatus { position: relative; height: 96px; margin: -40px 0 30px; pointer-events: none; }
+  .cstatus__hatch {
+    position: absolute; left: 0; top: 22px; width: min(62vw, 980px); height: 74px;
+    background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 9px), #1f2026;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 70px) 100%, 0 100%);
+    transform-origin: left;
+  }
+  .cstatus__tag {
+    position: absolute; left: 0; top: 0; height: 74px; width: min(50vw, 800px);
+    display: flex; align-items: center; gap: 18px;
+    padding: 0 90px 0 max(var(--gutter), calc((100vw - 1320px) / 2 + var(--gutter)));
+    background: var(--volt); color: var(--asphalt);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 60px) 100%, 0 100%);
+  }
+  .cstatus__label { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-sm); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+  .cstatus__label i { width: 10px; height: 10px; border-radius: 50%; background: var(--asphalt); animation: blink 1.2s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  .cstatus__text { font-size: clamp(0.95rem, 1.35vw, 1.3rem); line-height: 1.1; }
+  .cstatus__film {
+    position: absolute; left: min(57vw, 910px); top: 10px; width: 230px; height: 30px; overflow: hidden;
+    background: var(--asphalt); box-shadow: 0 0 0 3px var(--steel); rotate: -30deg;
+  }
+  .cstatus__film-track { display: flex; gap: 10px; padding: 7px 0; width: max-content; animation: cfilm 5s linear infinite; }
+  .cstatus__film i { width: 16px; height: 16px; background: var(--volt); flex: none; }
+  @keyframes cfilm { to { transform: translateX(-26px); } }
   .footer {
     display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
     padding: 22px var(--gutter) 28px; border-top: 1px solid var(--steel);
@@ -132,6 +168,9 @@ const year = new Date().getFullYear();
   .footer__top:hover { color: var(--volt); }
 
   @media (max-width: 960px) {
+    .cstatus { height: auto; margin: 0 0 24px; }
+    .cstatus__hatch, .cstatus__film { display: none; }
+    .cstatus__tag { position: relative; width: 94%; height: auto; padding: 16px 70px 16px var(--gutter); flex-wrap: wrap; gap: 4px 14px; }
     .contact__inner { grid-template-columns: 1fr; }
     .contact__tab { display: none; }
   }

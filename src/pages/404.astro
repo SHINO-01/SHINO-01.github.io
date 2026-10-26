@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import { loadSite, asset } from '../lib/data';
+const { profile } = await loadSite();
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Signal lost · {profile.codename}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href={asset('favicon.svg')} />
+  </head>
+  <body>
+    <main class="lost">
+      <div class="lost__static" aria-hidden="true"></div>
+      <img class="lost__ink" src={asset(profile.portrait.ink)} alt="" width="1400" height="1239" />
+      <div class="lost__copy">
+        <p class="lost__tag">Error 404</p>
+        <h1 class="lost__code display" data-text="404">404</h1>
+        <p class="lost__title display">Signal lost</p>
+        <p class="lost__text">This page doesn't exist. The link may be old, or the address has a typo.</p>
+        <a class="btn" href={import.meta.env.BASE_URL}>Back to {profile.codename}</a>
+      </div>
+      <div class="lost__tape stripes" aria-hidden="true"></div>
+    </main>
+  </body>
+</html>
+
+<style>
+  .lost { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 60px var(--gutter); overflow: clip; isolation: isolate; }
+  .lost__static {
+    position: absolute; inset: -50%; z-index: -2; opacity: 0.12;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: static 0.3s steps(3) infinite;
+  }
+  @keyframes static { 33% { transform: translate(-4%, 3%); } 66% { transform: translate(3%, -2%); } }
+  .lost__ink { position: absolute; right: -4%; bottom: 0; z-index: -1; width: min(60vw, 820px); opacity: 0.35; filter: grayscale(1) contrast(1.2); }
+  .lost__copy { max-width: 620px; display: grid; gap: 14px; justify-items: start; }
+  .lost__tag { background: var(--volt); color: var(--asphalt); font-weight: 700; font-size: var(--t-xs); letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 12px; }
+  .lost__code { position: relative; font-size: clamp(7rem, 22vw, 16rem); line-height: 0.85; }
+  .lost__code::before, .lost__code::after { content: attr(data-text); position: absolute; inset: 0; mix-blend-mode: screen; }
+  .lost__code::before { color: var(--ether); animation: g1 2s steps(1) infinite; }
+  .lost__code::after { color: var(--volt); animation: g2 1.7s steps(1) infinite; }
+  @keyframes g1 { 0%, 80%, 100% { opacity: 0; } 82% { opacity: 1; transform: translate(-8px, 2px); clip-path: inset(20% 0 50% 0); } 88% { opacity: 1; transform: translate(6px, 0); clip-path: inset(60% 0 10% 0); } }
+  @keyframes g2 { 0%, 70%, 100% { opacity: 0; } 72% { opacity: 1; transform: translate(8px, -2px); clip-path: inset(40% 0 30% 0); } }
+  .lost__title { font-size: var(--t-2xl); color: var(--volt); }
+  .lost__text { color: #c9c9c2; font-size: var(--t-lg); max-width: 40ch; margin-bottom: 10px; }
+  .lost__tape { position: absolute; left: -5%; right: -5%; bottom: 40px; height: 26px; rotate: -3deg; }
+</style>

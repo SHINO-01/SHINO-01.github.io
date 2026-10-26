@@ -200,19 +200,49 @@ function projects() {
   const cards = $$('[data-pcard]', sec);
   const mm = gsap.matchMedia();
 
+  const word = $('[data-proj-word]', sec);
+  const marks = $$('[data-proj-mark]', sec);
+  const slab = $('[data-proj-slab]', sec);
+
   mm.add('(min-width: 901px)', () => {
     const distance = () => Math.max(0, track.scrollWidth - innerWidth);
+    // place each ruler marker where its card's centre crosses the screen centre
+    const markAt: number[] = [];
+    const placeMarks = () => {
+      const d = distance() || 1;
+      cards.forEach((c, i) => {
+        const p = gsap.utils.clamp(0, 1, (c.offsetLeft + c.offsetWidth / 2 - innerWidth / 2) / d);
+        markAt[i] = p;
+        if (marks[i]) marks[i].style.left = `${p * 100}%`;
+      });
+    };
+    placeMarks();
+    ScrollTrigger.addEventListener('refreshInit', placeMarks);
     const scroller = gsap.to(track, {
       x: () => -distance(),
       ease: 'none',
       scrollTrigger: {
         trigger: sec, start: 'top top', end: () => `+=${distance()}`,
         pin: $('[data-proj-pin]', sec), scrub: 0.8, invalidateOnRefresh: true, anticipatePin: 1,
-        onUpdate: (self) => { if (bar) bar.style.transform = `scaleX(${self.progress})`; },
+        onUpdate: (self) => {
+          if (bar) bar.style.transform = `scaleX(${self.progress})`;
+          marks.forEach((m, i) => m.classList.toggle('is-on', self.progress >= markAt[i] - 0.03));
+        },
         // slide the section rail away so it never covers the cards
         onToggle: (self) => document.querySelector('[data-rail]')?.classList.toggle('is-away', self.isActive),
       },
     });
+    if (word) {
+      gsap.fromTo(word, { xPercent: 0 }, {
+        xPercent: -22, ease: 'none',
+        scrollTrigger: { trigger: sec, start: 'top top', end: () => `+=${distance()}`, scrub: 1.2, invalidateOnRefresh: true },
+      });
+    }
+    if (slab) {
+      gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top 60%', once: true } })
+        .from(slab, { scaleX: 0, duration: 0.9, ease: 'expo.out' })
+        .from($('[data-proj-film]', sec), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.35);
+    }
     cards.forEach((c) => {
       gsap.from(c, {
         yPercent: 18, rotate: 6, opacity: 0.2, ease: 'power2.out',
@@ -258,6 +288,13 @@ function contact() {
   if (title) {
     const split = SplitText.create(title, { type: 'words,chars', charsClass: 'char', mask: 'chars' });
     gsap.from(split.chars, { scrollTrigger: { trigger: title, start: 'top 82%', once: true }, yPercent: 110, duration: 0.8, ease: 'expo.out', stagger: 0.018 });
+  }
+  const status = $('[data-cstatus]', sec);
+  if (status) {
+    gsap.timeline({ scrollTrigger: { trigger: status, start: 'top 90%', once: true } })
+      .from($('[data-cstatus-hatch]', status), { scaleX: 0, duration: 0.8, ease: 'expo.out' })
+      .from($('[data-cstatus-tag]', status), { xPercent: -100, duration: 0.9, ease: 'expo.out' }, 0.1)
+      .from($('[data-cstatus-film]', status), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.4);
   }
   gsap.from($$('.contact__lede, .mailbox, .contact__row, .contact__socials li, .contact__langs', sec), {
     scrollTrigger: { trigger: $('.contact__inner', sec), start: 'top 75%', once: true },

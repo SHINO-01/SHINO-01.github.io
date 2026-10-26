@@ -10,7 +10,7 @@ const REACH = 200;
 const TONES = {
   dark: { hot: '215,255,31', base: '139,141,152', baseAlpha: 0.1 },
   light: { hot: '143,99,255', base: '16,16,19', baseAlpha: 0.07 },
-  volt: { hot: '16,16,19', base: '16,16,19', baseAlpha: 0 },
+  volt: { hot: '104,106,116', base: '16,16,19', baseAlpha: 0 }, // silver-grey on lime
 } as const;
 
 type Tone = keyof typeof TONES;

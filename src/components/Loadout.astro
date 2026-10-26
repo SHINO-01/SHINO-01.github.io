@@ -3,9 +3,10 @@ import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import type { CollectionEntry } from 'astro:content';
+import type { SiteCopy } from '../lib/data';
 
-interface Props { skills: CollectionEntry<'skills'>['data']; index: string }
-const { skills, index } = Astro.props;
+interface Props { skills: CollectionEntry<'skills'>['data']; copy: SiteCopy['loadout']; index: string }
+const { skills, copy, index } = Astro.props;
 
 const N = skills.attributes.length;
 const C = 210, R = 150;
@@ -32,7 +33,7 @@ const lines = (label: string) => {
   <Dots tone="light" />
   <div class="loadout__edge" aria-hidden="true"></div>
   <div class="loadout__inner">
-    <SectionHead id="loadout-title" index={index} title="Loadout" kicker="Skills and the tools I reach for" tone="light" jp="装備" />
+    <SectionHead id="loadout-title" index={index} title={copy.title} kicker={copy.kicker} tone="light" jp={copy.jp} />
 
     <div class="loadout__grid">
       <figure class="radar" data-radar data-values={JSON.stringify(skills.attributes.map((s) => s.value))} data-center={C} data-radius={R}>

@@ -1,6 +1,5 @@
 import gsap from 'gsap';
 
-const LOG = ['Linking agent profile', 'Syncing mission log', 'Calibrating loadout', 'Decrypting project files', 'Agent ready'];
 const SEEN_KEY = 'shino-booted';
 
 /** Game-style boot loader. Full sequence on first visit, a quick shutter on return visits. */
@@ -11,6 +10,7 @@ export function runBoot(): Promise<void> {
   let seen = false;
   try { seen = sessionStorage.getItem(SEEN_KEY) === '1'; sessionStorage.setItem(SEEN_KEY, '1'); } catch {}
 
+  const LOG: string[] = JSON.parse(boot.dataset.bootLines || '[""]');
   const bars = [...boot.querySelectorAll<HTMLElement>('.boot__bar i')];
   const pct = boot.querySelector<HTMLElement>('[data-boot-pct]')!;
   const log = boot.querySelector<HTMLElement>('[data-boot-log]')!;

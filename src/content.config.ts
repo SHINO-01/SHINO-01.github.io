@@ -28,7 +28,23 @@ const yearMonth = z
 const endDate = z.union([z.literal('present'), yearMonth]);
 const link = z.object({ label: z.string(), url: z.url() });
 
+const heading = z.object({ title: z.string(), kicker: z.string(), jp: z.string().default('') });
+
 export const collections = {
+  site: defineCollection({
+    loader: single('content/site.yaml'),
+    schema: z.object({
+      nav: z.object({ agent: z.string(), loadout: z.string(), missions: z.string(), projects: z.string(), records: z.string(), contact: z.string() }),
+      hero: z.object({ fileTag: z.string(), primaryCta: z.string(), secondaryCta: z.string(), sticker: z.string(), badgeCode: z.string() }),
+      loadout: heading,
+      missions: heading,
+      projects: heading.extend({ lede: z.string(), moreTitle: z.string(), moreText: z.string(), banner: z.array(z.string()).min(1) }),
+      records: heading.extend({ achievementsLabel: z.string(), trainingLabel: z.string(), paperCta: z.string() }),
+      contact: z.object({ heading: z.string(), lede: z.string(), marquee: z.string(), statusLabel: z.string().default('Status'), banner: z.array(z.string()).min(1) }),
+      boot: z.array(z.string()).min(1),
+      footer: z.string(),
+    }),
+  }),
   profile: defineCollection({
     loader: single('content/profile.yaml'),
     schema: z.object({

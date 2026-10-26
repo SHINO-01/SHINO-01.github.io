@@ -16,6 +16,7 @@ You never need to touch code for routine updates. Everything lives in `/content`
 | `content/projects.yaml` | Project cards: rank, colour, highlights, stack, links, optional screenshot |
 | `content/education.yaml` | Degrees and certificates |
 | `content/publications.yaml` | Papers, awards, talks (with optional animated metric ring) |
+| `content/site.yaml` | Navigation labels, section headings, intro text, banners, loading-screen lines, footer |
 
 Each file has comments at the top explaining its fields. To add an entry, copy
 an existing block and edit it.
@@ -29,7 +30,11 @@ an existing block and edit it.
 - **Project screenshots:** drop an image in `public/projects/` and set
   `image: projects/your-file.webp` on the project.
 - **Availability:** set `availability.open: false` in `profile.yaml` to turn
-  off the "open to roles" light and tape.
+  off the "open to roles" light, tape and the Contact status band.
+- **Skills chart:** each `value` in `skills.yaml` only sets how far that point
+  of the hexagon reaches. Numbers are never shown on the site.
+- **Share thumbnail:** `public/og.jpg` (1200×630) is the preview image shown
+  when the link is shared. Replace it if you change the hero a lot.
 
 If you make a mistake (missing field, bad date), the build stops and tells you
 exactly which file, entry and field is wrong.

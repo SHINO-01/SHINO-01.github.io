@@ -3,13 +3,14 @@ import { getCollection, getEntry } from 'astro:content';
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
 
 export async function loadSite() {
+  const site = (await getEntry('site', 'main'))!.data;
   const profile = (await getEntry('profile', 'main'))!.data;
   const skills = (await getEntry('skills', 'main'))!.data;
   const experience = (await getCollection('experience')).sort(byOrder).map((e) => e.data);
   const projects = (await getCollection('projects')).sort(byOrder).map((e) => e.data);
   const education = (await getCollection('education')).sort(byOrder).map((e) => e.data);
   const publications = (await getCollection('publications')).sort(byOrder).map((e) => e.data);
-  return { profile, skills, experience, projects, education, publications };
+  return { site, profile, skills, experience, projects, education, publications };
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -31,6 +32,8 @@ export function duration(start: string, end: string) {
   const m = months % 12;
   return [y && `${y} yr`, m && `${m} mo`].filter(Boolean).join(' ');
 }
+
+export type SiteCopy = Awaited<ReturnType<typeof loadSite>>['site'];
 
 /** Resolve a path inside /public against the configured base path. */
 export function asset(path: string) {

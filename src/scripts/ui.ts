@@ -50,9 +50,35 @@ function cursor() {
     const hit = (e.target as HTMLElement).closest('a, button, [data-tilt], [data-gear]');
     el.classList.toggle('is-hover', !!hit);
   });
-  addEventListener('pointerdown', () => el.classList.add('is-down'));
+  addEventListener('pointerdown', (e) => { el.classList.add('is-down'); burst(e.clientX, e.clientY); });
   addEventListener('pointerup', () => el.classList.remove('is-down'));
   document.documentElement.addEventListener('pointerleave', () => gsap.set([dot, ring], { x: -100, y: -100 }));
+}
+
+/* Game-style click feedback: a hex ring and sparks burst from the pointer. */
+function burst(x: number, y: number) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '-50 -50 100 100');
+  svg.setAttribute('class', 'burst');
+  svg.style.left = `${x}px`;
+  svg.style.top = `${y}px`;
+  const hex = document.createElementNS(NS, 'path');
+  hex.setAttribute('d', 'M0-22 19-11v22L0 22-19 11v-22Z');
+  svg.appendChild(hex);
+  const sparks = Array.from({ length: 6 }, (_, i) => {
+    const l = document.createElementNS(NS, 'line');
+    const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+    l.setAttribute('x1', String(Math.cos(a) * 26)); l.setAttribute('y1', String(Math.sin(a) * 26));
+    l.setAttribute('x2', String(Math.cos(a) * 34)); l.setAttribute('y2', String(Math.sin(a) * 34));
+    svg.appendChild(l);
+    return l;
+  });
+  document.body.appendChild(svg);
+  gsap.timeline({ onComplete: () => svg.remove() })
+    .fromTo(svg, { scale: 0.3, rotate: -30, opacity: 1 }, { scale: 1.4, rotate: 30, duration: 0.5, ease: 'expo.out' })
+    .fromTo(sparks, { scale: 0.4, svgOrigin: '0 0' }, { scale: 1.6, duration: 0.45, ease: 'expo.out' }, 0)
+    .to(svg, { opacity: 0, duration: 0.25 }, 0.25);
 }
 
 /* Buttons lean toward the pointer. */

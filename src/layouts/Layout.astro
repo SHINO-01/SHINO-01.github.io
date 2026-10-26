@@ -6,8 +6,9 @@ interface Props {
   title: string;
   description: string;
   codename: string;
+  boot: string[];
 }
-const { title, description, codename } = Astro.props;
+const { title, description, codename, boot } = Astro.props;
 const canonical = new URL(import.meta.env.BASE_URL, Astro.site).href;
 const ogImage = new URL(asset('og.jpg'), Astro.site).href;
 ---
@@ -43,9 +44,9 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Boot sequence: plays once per browser session. -->
-    <div class="boot" id="boot" aria-hidden="true">
+    <div class="boot" id="boot" aria-hidden="true" data-boot-lines={JSON.stringify(boot)}>
       <div class="boot__hud boot__hud--tl"><span>{codename}.SYS</span><span>v{new Date().getFullYear()}.10</span></div>
-      <div class="boot__hud boot__hud--br"><span data-boot-log>Linking agent profile</span></div>
+      <div class="boot__hud boot__hud--br"><span data-boot-log>{boot[0]}</span></div>
       <div class="boot__core">
         <div class="boot__logo display" data-text={codename}>{codename}</div>
         <div class="boot__bar">
@@ -141,9 +142,15 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
   .cursor.is-hover .cursor__ring { scale: 1.6; rotate: 45deg; }
   .cursor.is-down .cursor__ring { scale: 0.72; }
 
+  .burst {
+    position: fixed; z-index: 951; width: 70px; height: 70px; margin: -35px 0 0 -35px;
+    pointer-events: none; overflow: visible; mix-blend-mode: difference;
+    fill: none; stroke: var(--paper); stroke-width: 2.5;
+  }
+
   /* ───────────── Scroll progress + grain ───────────── */
   .progress { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 120; pointer-events: none; }
-  .progress i { display: block; height: 100%; background: var(--volt); transform-origin: left; transform: scaleX(0); }
+  .progress i { display: block; height: 100%; background: var(--ether); box-shadow: 0 0 10px rgb(143 99 255 / 0.7); transform-origin: left; transform: scaleX(0); }
   .grain {
     position: fixed; inset: -50%; z-index: 800; pointer-events: none; opacity: 0.07;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");

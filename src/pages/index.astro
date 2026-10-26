@@ -10,36 +10,29 @@ import Records from '../components/Records.astro';
 import Contact from '../components/Contact.astro';
 import { loadSite } from '../lib/data';
 
-const { profile, skills, experience, projects, education, publications } = await loadSite();
+const { site, profile, skills, experience, projects, education, publications } = await loadSite();
 
 // Navigation order. Each id matches a section below.
-const sections = [
-  { id: 'agent', label: 'Agent' },
-  { id: 'loadout', label: 'Loadout' },
-  { id: 'missions', label: 'Missions' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'records', label: 'Records' },
-  { id: 'contact', label: 'Contact' },
-];
+const sections = (['agent', 'loadout', 'missions', 'projects', 'records', 'contact'] as const).map((id) => ({ id, label: site.nav[id] }));
 const n = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
 const github = profile.socials.find((s) => s.icon.toLowerCase() === 'github')?.url;
 ---
-<Layout title={`${profile.name} · ${profile.title}`} description={profile.tagline} codename={profile.codename}>
+<Layout title={`${profile.name} · ${profile.title}`} description={profile.tagline} codename={profile.codename} boot={site.boot}>
   <Nav slot="chrome" codename={profile.codename} cv={profile.cv} sections={sections} />
-  <Hero profile={profile} />
+  <Hero profile={profile} copy={site.hero} />
   <!-- Hero tapes live outside the hero so they can run over the next section's edge. -->
   <div class="hero-tapes" aria-hidden="true" data-hero-tapes>
     <Tape items={[profile.availability.open ? profile.availability.label : profile.title, profile.location, profile.codename]} angle={-4} class="hero-tapes__a" />
     <Tape items={profile.roles} tone="dark" angle={3} reverse class="hero-tapes__b" />
   </div>
-  <Loadout skills={skills} index={n('loadout')} />
-  <Missions experience={experience} index={n('missions')} />
+  <Loadout skills={skills} copy={site.loadout} index={n('loadout')} />
+  <Missions experience={experience} copy={site.missions} index={n('missions')} />
   <div class="divider" aria-hidden="true">
-    <Tape items={['Projects', 'Open source', 'Shipped to production']} tone="hazard" angle={-2.5} />
+    <Tape items={site.projects.banner} tone="hazard" angle={-2.5} />
   </div>
-  <Projects projects={projects} index={n('projects')} github={github} />
-  <Records education={education} publications={publications} index={n('records')} />
-  <Contact profile={profile} index={n('contact')} />
+  <Projects projects={projects} copy={site.projects} index={n('projects')} github={github} />
+  <Records education={education} publications={publications} copy={site.records} index={n('records')} />
+  <Contact profile={profile} copy={site.contact} footer={site.footer} index={n('contact')} />
 </Layout>
 
 <style>

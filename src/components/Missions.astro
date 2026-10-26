@@ -4,14 +4,15 @@ import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import { fmtMonth, duration } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
+import type { SiteCopy } from '../lib/data';
 
-interface Props { experience: CollectionEntry<'experience'>['data'][]; index: string }
-const { experience, index } = Astro.props;
+interface Props { experience: CollectionEntry<'experience'>['data'][]; copy: SiteCopy['missions']; index: string }
+const { experience, copy, index } = Astro.props;
 ---
 <section class="missions" id="missions" aria-labelledby="missions-title">
   <Dots tone="dark" />
   <div class="missions__inner">
-    <SectionHead id="missions-title" index={index} title="Mission log" kicker="Where I've worked and what I shipped" jp="任務" />
+    <SectionHead id="missions-title" index={index} title={copy.title} kicker={copy.kicker} jp={copy.jp} />
 
     <div class="log-wrap" data-log>
     <div class="log__spine" aria-hidden="true"><i data-log-fill></i></div>
