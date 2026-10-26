@@ -1,5 +1,6 @@
 ---
 import SectionHead from './SectionHead.astro';
+import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import type { CollectionEntry } from 'astro:content';
 
@@ -14,17 +15,29 @@ const pt = (i: number, r: number) => {
 };
 const ring = (f: number) => skills.attributes.map((_, i) => pt(i, R * f).join(',')).join(' ');
 const shape = skills.attributes.map((s, i) => pt(i, (R * s.value) / 100).join(',')).join(' ');
-const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
+
+/** Break a label into at most two lines at the word boundary closest to its middle. */
+const lines = (label: string) => {
+  const words = label.split(' ');
+  if (label.length <= 14 || words.length < 2) return [label];
+  let best = 1, bestDiff = Infinity;
+  for (let k = 1; k < words.length; k++) {
+    const diff = Math.abs(words.slice(0, k).join(' ').length - words.slice(k).join(' ').length);
+    if (diff < bestDiff) { bestDiff = diff; best = k; }
+  }
+  return [words.slice(0, best).join(' '), words.slice(best).join(' ')];
+};
 ---
 <section class="loadout" id="loadout" aria-labelledby="loadout-title">
+  <Dots tone="light" />
   <div class="loadout__edge" aria-hidden="true"></div>
   <div class="loadout__inner">
     <SectionHead id="loadout-title" index={index} title="Loadout" kicker="Skills and the tools I reach for" tone="light" jp="装備" />
 
     <div class="loadout__grid">
       <figure class="radar" data-radar data-values={JSON.stringify(skills.attributes.map((s) => s.value))} data-center={C} data-radius={R}>
-        <svg viewBox="-80 -10 580 440" role="img" aria-labelledby="radar-desc">
-          <desc id="radar-desc">{skills.attributes.map((s) => `${s.name}: ${s.value} out of 100`).join('. ')}</desc>
+        <svg viewBox="-130 -12 690 448" role="img" aria-labelledby="radar-desc">
+          <desc id="radar-desc">Areas of focus: {skills.attributes.map((s) => s.name).join(', ')}.</desc>
           <g class="radar__grid">
             {[1, 0.75, 0.5, 0.25].map((f) => <polygon points={ring(f)} />)}
             {skills.attributes.map((_, i) => { const [x, y] = pt(i, R); return <line x1={C} y1={C} x2={x} y2={y} />; })}
@@ -32,26 +45,24 @@ const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
           <polygon class="radar__shape" points={shape} data-radar-shape />
           {skills.attributes.map((s, i) => { const [x, y] = pt(i, (R * s.value) / 100); return <circle class="radar__node" cx={x} cy={y} r="5" data-radar-node />; })}
           {skills.attributes.map((s, i) => {
-            const [x, y] = pt(i, R + 34);
+            const [x, y] = pt(i, R + 22);
             const anchor = Math.abs(x - C) < 8 ? 'middle' : x > C ? 'start' : 'end';
+            const ls = lines(s.name);
+            // top label sits above its vertex, bottom label below, side labels centred on it
+            const y0 = y < C - 8 ? y - (ls.length - 1) * 21 - 6 : y > C + 8 ? y + 20 : y - (ls.length - 1) * 10.5 + 6;
             return (
-              <g class="radar__label" data-radar-label>
-                <text x={x} y={y - 4} text-anchor={anchor} class="radar__short">{s.short}</text>
-                <text x={x} y={y + 14} text-anchor={anchor} class="radar__val" data-count={s.value}>{s.value}</text>
-              </g>
+              <text class="radar__name" x={x} y={y0} text-anchor={anchor} data-radar-label>
+                {ls.map((l, j) => <tspan x={x} dy={j ? 21 : 0}>{l}</tspan>)}
+              </text>
             );
           })}
         </svg>
-        <figcaption class="radar__core">
-          <span class="radar__avg display" data-count={avg}>{avg}</span>
-          <span class="radar__avg-label">Overall</span>
-        </figcaption>
       </figure>
 
       <div class="slots">
         {skills.loadout.map((slot) => (
           <div class="slot" data-slot>
-            <h3 class="slot__name">{slot.slot}<span>{String(slot.items.length).padStart(2, '0')}</span></h3>
+            <h3 class="slot__name">{slot.slot}</h3>
             <ul class="slot__items">
               {slot.items.map((item) => (
                 <li class="gear" data-gear>
@@ -64,12 +75,6 @@ const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
         ))}
       </div>
     </div>
-
-    <ul class="attr-list">
-      {skills.attributes.map((s) => (
-        <li><span>{s.name}</span><span class="attr-list__bar"><i style={`--v:${s.value / 100}`} data-bar></i></span></li>
-      ))}
-    </ul>
   </div>
 </section>
 
@@ -86,7 +91,7 @@ const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
     clip-path: polygon(0 100%, 100% 0, 100% 100%);
   }
   .loadout__inner { max-width: 1320px; margin: 0 auto; }
-  .loadout__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
+  .loadout__grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: clamp(32px, 5vw, 80px); align-items: center; }
 
   .radar { position: relative; margin: 0; }
   .radar svg { width: 100%; height: auto; overflow: visible; }
@@ -95,19 +100,13 @@ const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
   .radar__grid line { stroke: rgb(16 16 19 / 0.18); stroke-dasharray: 3 4; }
   .radar__shape { fill: rgb(215 255 31 / 0.85); stroke: var(--asphalt); stroke-width: 3; stroke-linejoin: round; mix-blend-mode: multiply; }
   .radar__node { fill: var(--ether); stroke: var(--asphalt); stroke-width: 2.5; }
-  .radar__short { font-family: var(--f-ui); font-weight: 700; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; fill: var(--asphalt); }
-  .radar__val { font-family: var(--f-display); font-size: 15px; fill: var(--ether); }
-  .radar__core { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; pointer-events: none; }
-  .radar__avg { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1; color: var(--asphalt); text-shadow: 3px 3px 0 var(--paper); }
-  .radar__avg-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+  .radar__name { font-family: var(--f-ui); font-weight: 700; font-size: 19px; fill: var(--asphalt); }
 
   .slots { display: grid; gap: 26px; }
   .slot__name {
-    display: flex; justify-content: space-between; align-items: baseline;
     font-family: var(--f-ui); font-weight: 700; font-size: var(--t-sm); letter-spacing: 0.12em; text-transform: uppercase;
     padding-bottom: 8px; margin-bottom: 12px; border-bottom: 2px solid var(--asphalt);
   }
-  .slot__name span { color: var(--ether); }
   .slot__items { display: flex; flex-wrap: wrap; gap: 8px; }
   .gear {
     --brand: var(--volt);
@@ -124,13 +123,9 @@ const avg = Math.round(skills.attributes.reduce((s, a) => s + a.value, 0) / N);
   .gear :global(.gear__icon) { width: 20px; height: 20px; flex: none; transition: transform 0.4s var(--ease-out); }
   .gear:hover :global(.gear__icon) { transform: rotate(-12deg) scale(1.15); color: var(--volt); }
 
-  .attr-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 36px; margin-top: clamp(40px, 6vw, 70px); }
-  .attr-list li { display: grid; gap: 6px; font-size: var(--t-sm); font-weight: 600; }
-  .attr-list__bar { height: 8px; background: rgb(16 16 19 / 0.12); transform: skewX(-20deg); overflow: hidden; }
-  .attr-list__bar i { display: block; height: 100%; background: var(--asphalt); transform-origin: left; transform: scaleX(var(--v)); }
-
   @media (max-width: 900px) {
     .loadout__grid { grid-template-columns: 1fr; }
     .radar { max-width: 460px; margin-inline: auto; width: 100%; }
+    .radar__name { font-size: 22px; }
   }
 </style>

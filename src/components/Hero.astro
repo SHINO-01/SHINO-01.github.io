@@ -2,6 +2,7 @@
 import { asset } from '../lib/data';
 import Tape from './Tape.astro';
 import Icon from './Icon.astro';
+import Dots from './Dots.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props { profile: CollectionEntry<'profile'>['data'] }
@@ -9,7 +10,7 @@ const { profile: p } = Astro.props;
 const longest = Math.max(...p.nameLines.map((l) => l.length));
 ---
 <section class="hero" id="agent" aria-labelledby="hero-name" data-hero>
-  <canvas class="hero__dots" data-halftone aria-hidden="true"></canvas>
+  <Dots tone="dark" base="wave" z={-3} />
   <div class="hero__ghost display" aria-hidden="true" data-hero-ghost>{p.codename}</div>
 
   <div class="hero__stage" data-hero-stage aria-hidden="true">
@@ -30,12 +31,8 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
 
     <!-- stickers -->
     <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
-      <path d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
+      <path transform="translate(120 0) scale(-1 1)" d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
       <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">hi!</text>
-    </svg>
-    <svg class="sticker sticker--burst" viewBox="0 0 120 120" data-sticker>
-      <path d="M60 4l10 22 22-12-2 25 25 3-17 18 17 18-25 3 2 25-22-12-10 22-10-22-22 12 2-25-25-3 17-18L4 42l25-3-2-25 22 12Z" fill="var(--hazard)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
-      <text x="60" y="70" text-anchor="middle" font-family="Dela Gothic One" font-size="26" fill="var(--asphalt)">AI</text>
     </svg>
     <svg class="sticker sticker--code" viewBox="0 0 150 54" data-sticker>
       <rect x="3" y="3" width="144" height="48" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="4" />
@@ -108,7 +105,6 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
     padding: 110px var(--gutter) 150px;
     isolation: isolate;
   }
-  .hero__dots { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -3; }
   .hero__ghost {
     position: absolute; left: -0.04em; bottom: 0.4em; z-index: -2;
     font-size: clamp(8rem, 30vw, 30rem); line-height: 0.8;
@@ -159,9 +155,8 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
   }
 
   .sticker { position: absolute; filter: drop-shadow(5px 6px 0 rgb(16 16 19 / 0.85)); }
-  .sticker--bubble { width: clamp(70px, 8vw, 120px); right: 41%; top: 22%; rotate: -10deg; }
-  .sticker--burst { width: clamp(70px, 7.5vw, 112px); right: 25%; top: 13%; rotate: 12deg; }
-  .sticker--code { width: clamp(110px, 11vw, 160px); right: 32%; bottom: 25%; rotate: -6deg; }
+  .sticker--bubble { width: clamp(70px, 8vw, 120px); right: 23%; top: 15%; rotate: 8deg; }
+    .sticker--code { width: clamp(110px, 11vw, 160px); right: 32%; bottom: 25%; rotate: -6deg; }
 
   /* ── copy ── */
   .hero__copy { position: relative; z-index: 2; max-width: 820px; container-type: inline-size; }
@@ -229,8 +224,7 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
     .hero__tagline { font-size: var(--t-md); }
     .hero__tri { width: 120px; }
     .sticker--code, .hero__scroll { display: none; }
-    .sticker--bubble { right: auto; left: 6%; top: 20%; }
-    .sticker--burst { top: 12%; right: 4%; }
+    .sticker--bubble { right: 8%; top: 13%; }
     .hero__jp { top: 70px; right: 14px; font-size: 5rem; }
     .hero__copy::before {
       content: ''; position: absolute; inset: -40px -40px -20px; z-index: -1;

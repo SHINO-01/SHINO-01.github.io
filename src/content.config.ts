@@ -55,7 +55,7 @@ export const collections = {
     loader: single('content/skills.yaml'),
     schema: z.object({
       attributes: z
-        .array(z.object({ name: z.string(), short: z.string(), value: z.number().min(0).max(100) }))
+        .array(z.object({ name: z.string(), value: z.number().min(0).max(100) }))
         .min(3)
         .max(8),
       loadout: z.array(z.object({ slot: z.string(), items: z.array(z.string()) })),

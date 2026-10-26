@@ -108,7 +108,7 @@ export function heroIdle() {
   const fine = matchMedia('(pointer: fine)').matches;
   if (fine) {
     const layers: [string, number][] = [
-      ['[data-hero-portrait]', 18], ['[data-hero-jp]', -36], ['[data-hero-ghost]', -14], ['[data-hero-card]', 10], ['.sticker--bubble', 34], ['.sticker--burst', 44], ['.sticker--code', 26],
+      ['[data-hero-portrait]', 18], ['[data-hero-jp]', -36], ['[data-hero-ghost]', -14], ['[data-hero-card]', 10], ['.sticker--bubble', 34], ['.sticker--code', 26],
     ];
     const movers = layers.map(([sel, d]) => {
       const el = $(sel, h);
@@ -121,59 +121,4 @@ export function heroIdle() {
     });
   }
 
-  halftone(h);
-}
-
-/* ───────── halftone dot field ───────── */
-function halftone(h: HTMLElement) {
-  const canvas = $<HTMLCanvasElement>('[data-halftone]', h);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d')!;
-  const GAP = 22;
-  let w = 0, ht = 0, dpr = 1;
-  const mouse = { x: -999, y: -999, tx: -999, ty: -999 };
-  let running = false;
-
-  const resize = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2);
-    w = h.clientWidth; ht = h.clientHeight;
-    canvas.width = w * dpr; canvas.height = ht * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  };
-  resize();
-  new ResizeObserver(resize).observe(h);
-
-  h.addEventListener('pointermove', (e) => {
-    const r = h.getBoundingClientRect();
-    mouse.tx = e.clientX - r.left; mouse.ty = e.clientY - r.top;
-  });
-  h.addEventListener('pointerleave', () => { mouse.tx = -999; mouse.ty = -999; });
-
-  const draw = (t: number) => {
-    mouse.x += (mouse.tx - mouse.x) * 0.12;
-    mouse.y += (mouse.ty - mouse.y) * 0.12;
-    ctx.clearRect(0, 0, w, ht);
-    const time = t * 0.0006;
-    for (let y = GAP / 2; y < ht; y += GAP) {
-      for (let x = GAP / 2; x < w * 0.62; x += GAP) {
-        // fade the field out towards the art side, add a slow travelling wave
-        const fade = 1 - x / (w * 0.62);
-        const wave = (Math.sin(x * 0.012 + y * 0.008 - time * 3) + 1) / 2;
-        const dx = x - mouse.x, dy = y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const near = Math.max(0, 1 - dist / 200);
-        const r = 0.6 + wave * 1.1 * fade + near * 5;
-        if (near > 0.02) ctx.fillStyle = `rgba(215,255,31,${0.25 + near * 0.75})`;
-        else ctx.fillStyle = `rgba(139,141,152,${0.12 + wave * 0.18 * fade})`;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-  };
-  const tick = (t: number) => { if (running) { draw(t); requestAnimationFrame(tick); } };
-  new IntersectionObserver(([e]) => {
-    if (e.isIntersecting && !running) { running = true; requestAnimationFrame(tick); }
-    else if (!e.isIntersecting) running = false;
-  }).observe(h);
 }

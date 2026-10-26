@@ -8,6 +8,7 @@ import { heroIntro, heroIdle, heroInitialState } from './hero';
 import { initScroll } from './scroll';
 import { initUI } from './ui';
 import { setLenis } from './state';
+import { initDots } from './dots';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
@@ -40,6 +41,7 @@ if (!motion) {
     lenis?.start();
     heroIntro();
     heroIdle();
+    initDots();
     initScroll(true);
     if (hash) lenis?.scrollTo(hash, { immediate: true, force: true });
   });

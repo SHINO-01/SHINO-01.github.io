@@ -1,5 +1,6 @@
 ---
 import SectionHead from './SectionHead.astro';
+import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import { fmtMonth, duration } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
@@ -8,6 +9,7 @@ interface Props { experience: CollectionEntry<'experience'>['data'][]; index: st
 const { experience, index } = Astro.props;
 ---
 <section class="missions" id="missions" aria-labelledby="missions-title">
+  <Dots tone="dark" />
   <div class="missions__inner">
     <SectionHead id="missions-title" index={index} title="Mission log" kicker="Where I've worked and what I shipped" jp="任務" />
 

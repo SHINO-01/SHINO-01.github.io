@@ -1,5 +1,6 @@
 ---
 import SectionHead from './SectionHead.astro';
+import Dots from './Dots.astro';
 import Icon from './Icon.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
@@ -9,6 +10,7 @@ const { projects, index, github } = Astro.props;
 const stars = { S: 5, A: 4, B: 3 } as const;
 ---
 <section class="projects" id="projects" aria-labelledby="projects-title" data-projects>
+  <Dots tone="volt" />
   <div class="projects__bg halftone" aria-hidden="true"></div>
   <div class="projects__pin" data-proj-pin>
     <div class="projects__track" data-proj-track>

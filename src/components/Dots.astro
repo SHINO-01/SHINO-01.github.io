@@ -1,0 +1,18 @@
+---
+/**
+ * Interactive halftone dot field. Sits behind a section's content; dots swell
+ * and light up around the cursor in a colour that contrasts with the section:
+ *   dark  → lime dots, light → violet dots, volt → black dots.
+ * base: "wave" (animated field, hero), "faint" (subtle static grid) or "none".
+ */
+interface Props { tone: 'dark' | 'light' | 'volt'; base?: 'wave' | 'faint' | 'none'; z?: number }
+const { tone, base = 'faint', z = -1 } = Astro.props;
+---
+<div class="dots" data-dots={tone} data-dots-base={base} style={`z-index:${z}`} aria-hidden="true">
+  <canvas></canvas>
+</div>
+<style>
+  .dots { position: absolute; inset: 0; pointer-events: none; overflow: clip; }
+  /* viewport-sized canvas that rides along while its section is on screen */
+  canvas { position: sticky; top: 0; display: block; width: 100%; height: 100vh; height: 100lvh; }
+</style>

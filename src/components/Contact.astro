@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import Dots from './Dots.astro';
 import Tape from './Tape.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
@@ -9,6 +10,7 @@ const { profile: p, index } = Astro.props;
 const year = new Date().getFullYear();
 ---
 <section class="contact" id="contact" aria-labelledby="contact-title">
+  <Dots tone="dark" />
   <div class="contact__marquee" aria-hidden="true" data-marquee>
     <div class="contact__marquee-track" data-marquee-track>
       {[0, 1].map(() => (
@@ -72,7 +74,7 @@ const year = new Date().getFullYear();
 </section>
 
 <style>
-  .contact { position: relative; background: var(--asphalt); overflow: clip; padding-top: clamp(40px, 6vw, 80px); }
+  .contact { position: relative; isolation: isolate; background: var(--asphalt); overflow: clip; padding-top: clamp(40px, 6vw, 80px); }
   .contact__marquee { overflow: hidden; padding: 10px 0 0; }
   .contact__marquee-track { display: flex; width: max-content; will-change: transform; }
   .contact__marquee-run { flex: none; font-size: clamp(4rem, 13vw, 12rem); line-height: 1; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px var(--steel); padding-right: 0.3em; }

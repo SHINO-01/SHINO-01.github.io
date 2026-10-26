@@ -146,7 +146,6 @@ function radar() {
   values.forEach((v, i) => {
     tl.to(state, { [i]: v, duration: 1.3, ease: 'elastic.out(1, 0.6)', onUpdate: render }, 0.35 + i * 0.07);
   });
-  $$('[data-radar-label] [data-count], .radar__avg[data-count]', fig).forEach((el) => tl.add(countUp(el, 1.5), 0.35));
 
   gsap.from($$('[data-gear]', sec), {
     scrollTrigger: { trigger: $('.slots', sec), start: 'top 80%', once: true },
@@ -155,10 +154,6 @@ function radar() {
   gsap.from($$('[data-slot] .slot__name', sec), {
     scrollTrigger: { trigger: $('.slots', sec), start: 'top 80%', once: true },
     clipPath: 'inset(0 100% 0 0)', duration: 0.8, ease: 'expo.out', stagger: 0.08,
-  });
-  gsap.from($$('[data-bar]', sec), {
-    scrollTrigger: { trigger: $('.attr-list', sec), start: 'top 88%', once: true },
-    scaleX: 0, duration: 1.2, ease: 'expo.out', stagger: 0.06,
   });
 }
 
