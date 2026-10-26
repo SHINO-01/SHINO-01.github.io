@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-10-26T13:55:05.093Z",
         "reason": "Claude triage: nav pill is an absolutely positioned indicator whose width must match each tab label; animating width only reflows the pill itself, on section change. Rail width animation was replaced with translate."
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/components/Hero.astro"
+        ],
+        "createdAt": "2026-10-26T17:15:27.741Z",
+        "reason": "user confirmed: approved the hero plan item 3 (light sweep across the name) and the lab demo; the text is solid, the clipped gradient is a transparent overlay carrying a moving highlight band"
       }
     ]
   }
