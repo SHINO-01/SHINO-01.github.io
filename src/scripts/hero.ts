@@ -17,7 +17,7 @@ export function heroInitialState() {
   gsap.set($$('[data-hero-in]', h), { y: 28, opacity: 0 });
   gsap.set($('[data-hero-card]', h), { xPercent: 25, opacity: 0 });
   gsap.set($$('[data-sticker]', h), { scale: 0, rotate: -40 });
-  gsap.set($$('.hero__tapes .tape', h), { yPercent: 260 });
+  gsap.set($$('[data-hero-tapes] .tape'), { yPercent: 260 });
   gsap.set($('[data-hero-ghost]', h), { opacity: 0, x: 120 });
 }
 
@@ -35,7 +35,7 @@ export function heroIntro() {
     .to($$('[data-hero-in]', h), { y: 0, opacity: 1, duration: 0.8, stagger: 0.07 }, 0.6)
     .to($('[data-hero-card]', h), { xPercent: 0, opacity: 1, duration: 0.9 }, 0.8)
     .to($$('[data-sticker]', h), { scale: 1, rotate: 0, duration: 0.7, ease: 'back.out(2.2)', stagger: 0.1 }, 1)
-    .to($$('.hero__tapes .tape', h), { yPercent: 0, duration: 0.9, stagger: 0.08, ease: 'power4.out' }, 0.7)
+    .to($$('[data-hero-tapes] .tape'), { yPercent: 0, duration: 0.9, stagger: 0.08, ease: 'power4.out' }, 0.7)
     .add(() => { gsap.set($('[data-hero-portrait]', h), { clearProps: 'filter' }); });
   return tl;
 }

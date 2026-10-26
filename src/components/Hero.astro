@@ -1,6 +1,5 @@
 ---
 import { asset } from '../lib/data';
-import Tape from './Tape.astro';
 import Icon from './Icon.astro';
 import Dots from './Dots.astro';
 import type { CollectionEntry } from 'astro:content';
@@ -24,16 +23,17 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
     <div class="hero__portrait" data-hero-portrait>
       <img class="hero__img hero__img--ink" src={asset(p.portrait.ink)} alt="" width="1400" height="1239" data-hero-ink />
       <img class="hero__img hero__img--main" src={asset(p.portrait.main)} alt="" width="1400" height="1239" fetchpriority="high" data-hero-main />
+
+      <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
+        <path transform="translate(120 0) scale(-1 1)" d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
+        <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">hi!</text>
+      </svg>
       <div class="hero__slices" data-hero-slices>
         {Array.from({ length: 6 }).map(() => <div style={`background-image:url(${asset(p.portrait.main)})`}></div>)}
       </div>
     </div>
 
     <!-- stickers -->
-    <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
-      <path transform="translate(120 0) scale(-1 1)" d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
-      <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">hi!</text>
-    </svg>
     <svg class="sticker sticker--code" viewBox="0 0 150 54" data-sticker>
       <rect x="3" y="3" width="144" height="48" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="4" />
       <g fill="var(--asphalt)">
@@ -88,10 +88,6 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
 
   <div class="hero__scroll" aria-hidden="true"><span>Scroll</span><i></i></div>
 
-  <div class="hero__tapes" aria-hidden="true">
-    <Tape items={[p.availability.open ? p.availability.label : p.title, p.location, p.codename]} angle={-4} class="hero__tape-a" />
-    <Tape items={p.roles} tone="dark" angle={3} reverse class="hero__tape-b" />
-  </div>
 </section>
 
 <style>
@@ -155,7 +151,7 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
   }
 
   .sticker { position: absolute; filter: drop-shadow(5px 6px 0 rgb(16 16 19 / 0.85)); }
-  .sticker--bubble { width: clamp(70px, 8vw, 120px); right: 23%; top: 15%; rotate: 8deg; }
+  .sticker--bubble { width: 12%; right: 59%; top: 9%; rotate: -8deg; z-index: 2; }
     .sticker--code { width: clamp(110px, 11vw, 160px); right: 32%; bottom: 25%; rotate: -6deg; }
 
   /* ── copy ── */
@@ -208,10 +204,6 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
   .hero__scroll i::after { content: ''; position: absolute; inset: 0; background: var(--volt); animation: scrollcue 1.8s var(--ease-snap) infinite; }
   @keyframes scrollcue { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 
-  .hero__tapes { position: absolute; left: 0; right: 0; bottom: 20px; z-index: 5; height: 100px; }
-  .hero__tapes :global(.tape) { position: absolute; left: 0; }
-  .hero__tapes :global(.hero__tape-a) { bottom: 34px; }
-  .hero__tapes :global(.hero__tape-b) { bottom: 10px; }
 
   @media (max-width: 1080px) {
     .card { display: none; }
@@ -224,7 +216,6 @@ const longest = Math.max(...p.nameLines.map((l) => l.length));
     .hero__tagline { font-size: var(--t-md); }
     .hero__tri { width: 120px; }
     .sticker--code, .hero__scroll { display: none; }
-    .sticker--bubble { right: 8%; top: 13%; }
     .hero__jp { top: 70px; right: 14px; font-size: 5rem; }
     .hero__copy::before {
       content: ''; position: absolute; inset: -40px -40px -20px; z-index: -1;

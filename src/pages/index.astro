@@ -27,6 +27,11 @@ const github = profile.socials.find((s) => s.icon.toLowerCase() === 'github')?.u
 <Layout title={`${profile.name} · ${profile.title}`} description={profile.tagline} codename={profile.codename}>
   <Nav slot="chrome" codename={profile.codename} cv={profile.cv} sections={sections} />
   <Hero profile={profile} />
+  <!-- Hero tapes live outside the hero so they can run over the next section's edge. -->
+  <div class="hero-tapes" aria-hidden="true" data-hero-tapes>
+    <Tape items={[profile.availability.open ? profile.availability.label : profile.title, profile.location, profile.codename]} angle={-4} class="hero-tapes__a" />
+    <Tape items={profile.roles} tone="dark" angle={3} reverse class="hero-tapes__b" />
+  </div>
   <Loadout skills={skills} index={n('loadout')} />
   <Missions experience={experience} index={n('missions')} />
   <div class="divider" aria-hidden="true">
@@ -38,6 +43,10 @@ const github = profile.socials.find((s) => s.icon.toLowerCase() === 'github')?.u
 </Layout>
 
 <style>
+  .hero-tapes { position: relative; z-index: 4; height: 0; }
+  .hero-tapes :global(.tape) { position: absolute; left: 0; }
+  .hero-tapes :global(.hero-tapes__a) { bottom: 54px; }
+  .hero-tapes :global(.hero-tapes__b) { bottom: 30px; }
   .divider { position: relative; z-index: 3; height: 0; }
   .divider :global(.tape) { position: absolute; top: -28px; }
 </style>
