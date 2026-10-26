@@ -157,6 +157,28 @@ function radar() {
   });
 }
 
+/** Slot-machine roll of a number's digits, settling on its final value. */
+function odometer(el: HTMLElement, duration: number) {
+  const final = el.dataset.odometer || el.textContent || '';
+  const o = { t: 0 };
+  return gsap.to(o, {
+    t: 1, duration, ease: 'none',
+    onUpdate: () => {
+      el.textContent = o.t >= 1 ? final : final.replace(/\d/g, () => String(Math.floor(Math.random() * 10)));
+    },
+    onComplete: () => { el.textContent = final; },
+  });
+}
+
+/** Two-frame inverted flash, a punch of the speed lines and a short shake. */
+function impact(tag: HTMLElement, box: HTMLElement, speed: HTMLElement | null) {
+  tag.classList.add('is-impact');
+  setTimeout(() => tag.classList.remove('is-impact'), 110);
+  speed?.dispatchEvent(new Event('speed:punch'));
+  gsap.fromTo(tag, { scale: 1.08 }, { scale: 1, duration: 0.5, ease: 'elastic.out(1, 0.45)' });
+  gsap.fromTo(box, { x: -5 }, { x: 0, duration: 0.4, ease: 'elastic.out(1, 0.3)' });
+}
+
 /* ───────── mission log ───────── */
 function missions() {
   const log = $('[data-log]');
@@ -174,15 +196,20 @@ function missions() {
       .from($('[data-stamp]', card), { scale: 2.6, opacity: 0, rotate: -30, duration: 0.35, ease: 'power4.in' }, 0.6)
       .to(card, { x: '+=6', duration: 0.05, repeat: 3, yoyo: true, ease: 'none' });
 
-    // side panel: slab, tag and film strip slam in from the screen edge
+    // side panel: slab and tag slam in, the number spins like an odometer, then an impact frame
     const side = $('[data-mside]', m);
     if (side) {
       const dir = m.classList.contains('mission--l') ? 1 : -1;
+      const tag = $('[data-mside-tag]', side)!;
+      const numEl = $('[data-odometer]', side)!;
+      const speed = $('[data-speed]', side);
       tl.from($('[data-mside-hatch]', side), { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 0.1)
-        .from($('[data-mside-tag]', side), { xPercent: 70 * dir, skewX: -18 * dir, opacity: 0, duration: 0.8, ease: 'expo.out' }, 0.2)
-        .from($('.mside__num', side), { yPercent: 60, opacity: 0, duration: 0.6, ease: 'back.out(2)' }, 0.45)
-        .from($('[data-mside-film]', side), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.4)
-        .from($$('.mside__code, .mside__jp', side), { opacity: 0, y: 12, duration: 0.5, stagger: 0.08 }, 0.55);
+        .from(tag, { xPercent: 70 * dir, skewX: -18 * dir, opacity: 0, duration: 0.8, ease: 'expo.out' }, 0.2)
+        .add(odometer(numEl, 0.55), 0.3)
+        .add(() => impact(tag, side, speed), 0.86)
+        .from($('.chev', side), { scaleX: 0, transformOrigin: dir > 0 ? 'left center' : 'right center', duration: 0.6, ease: 'expo.out' }, 0.5)
+        .from($('[data-crt]', side), { y: 50, rotate: -14 * dir, opacity: 0, duration: 0.7, ease: 'back.out(2)' }, 0.6)
+        .from($('.mside__jp', side), { opacity: 0, y: 12, duration: 0.5 }, 0.7);
       gsap.fromTo($('[data-mside-year]', side), { yPercent: 35 }, {
         yPercent: -35, ease: 'none',
         scrollTrigger: { trigger: m, start: 'top bottom', end: 'bottom top', scrub: 0.6 },
@@ -241,7 +268,7 @@ function projects() {
     if (slab) {
       gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top 60%', once: true } })
         .from(slab, { scaleX: 0, duration: 0.9, ease: 'expo.out' })
-        .from($('[data-proj-film]', sec), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.35);
+        .add(() => $('.projects__speed', sec)?.dispatchEvent(new Event('speed:punch')), 0.2);
     }
     cards.forEach((c) => {
       gsap.from(c, {
@@ -294,7 +321,7 @@ function contact() {
     gsap.timeline({ scrollTrigger: { trigger: status, start: 'top 90%', once: true } })
       .from($('[data-cstatus-hatch]', status), { scaleX: 0, duration: 0.8, ease: 'expo.out' })
       .from($('[data-cstatus-tag]', status), { xPercent: -100, duration: 0.9, ease: 'expo.out' }, 0.1)
-      .from($('[data-cstatus-film]', status), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.4);
+      .from($('[data-crt]', status), { y: 60, rotate: 20, opacity: 0, duration: 0.8, ease: 'back.out(2)' }, 0.35);
   }
   gsap.from($$('.contact__lede, .mailbox, .contact__row, .contact__socials li, .contact__langs', sec), {
     scrollTrigger: { trigger: $('.contact__inner', sec), start: 'top 75%', once: true },

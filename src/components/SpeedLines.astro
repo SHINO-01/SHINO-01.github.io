@@ -1,0 +1,18 @@
+---
+/**
+ * Anime concentration lines (集中線). A canvas that redraws tapered lines
+ * converging on a focus point at ~12fps so they "boil" like hand-drawn frames.
+ * fx / fy: focus point as a fraction of the box (0–1).
+ */
+interface Props { fx?: number; fy?: number; tone?: 'paper' | 'ink' | 'volt'; class?: string }
+const { fx = 0.5, fy = 0.5, tone = 'paper', class: cls } = Astro.props;
+---
+<canvas class:list={['speed', cls]} data-speed data-fx={fx} data-fy={fy} data-tone={tone} aria-hidden="true"></canvas>
+<style>
+  .speed {
+    position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+    /* soften the box edges so the burst dissolves into the section */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+  }
+</style>

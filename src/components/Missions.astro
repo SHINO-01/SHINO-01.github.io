@@ -2,12 +2,26 @@
 import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import Icon from './Icon.astro';
+import Crt from './Crt.astro';
+import Chevrons from './Chevrons.astro';
+import Ticker from './Ticker.astro';
+import SpeedLines from './SpeedLines.astro';
 import { fmtMonth, duration } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
 import type { SiteCopy } from '../lib/data';
 
 interface Props { experience: CollectionEntry<'experience'>['data'][]; copy: SiteCopy['missions']; index: string }
 const { experience, copy, index } = Astro.props;
+
+/** Short company mark for the CRT screen: "W3 Engineers Ltd" → "W3", "SForger" → "SF". */
+const mark = (name: string) => {
+  const words = name.split(/\s+/).filter((w) => !/^(ltd|inc|llc|pty|co)\.?$/i.test(w));
+  if (words[0].length <= 3) return words[0].toUpperCase();
+  if (words.length > 1) return words.slice(0, 3).map((w) => w[0]).join('').toUpperCase();
+  const caps = words[0].replace(/[^A-Z]/g, '');
+  return (caps.length >= 2 ? caps.slice(0, 3) : words[0].slice(0, 2)).toUpperCase();
+};
+const yy = (ym: string) => (ym === 'present' ? 'NOW' : `${ym.slice(2, 4)}.${ym.slice(5, 7)}`);
 ---
 <section class="missions" id="missions" aria-labelledby="missions-title">
   <Dots tone="dark" />
@@ -52,21 +66,22 @@ const { experience, copy, index } = Astro.props;
               <span class="mission__stamp display" aria-hidden="true" data-stamp>{active ? 'In progress' : 'Cleared'}</span>
             </article>
 
-            {/* decorative panel that fills the empty side of the timeline */}
+            {/* motion-graphic panel that fills the empty side of the timeline */}
             <div class="mside" aria-hidden="true" data-mside>
+              <SpeedLines fx={i % 2 ? 0.34 : 0.66} fy={0.2} class="mside__speed" />
               <span class="mside__year display" data-mside-year>{job.start.slice(0, 4)}</span>
-              <div class="mside__hatch" data-mside-hatch></div>
+              <div class="mside__hatch" data-mside-hatch>
+                <Ticker class="mside__ticker" reverse={i % 2 === 1} items={[job.company, `${yy(job.start)} — ${yy(job.end)}`, active ? 'In progress' : 'Mission cleared', job.location ?? '', ...job.stack].filter(Boolean)} />
+              </div>
               <div class="mside__tag" data-mside-tag>
                 <span class="mside__label">Mission</span>
-                <span class="mside__num display">{num}</span>
+                <span class="mside__num display" data-odometer={num}>{num}</span>
               </div>
-              <div class="mside__film" data-mside-film>
-                <div class="mside__film-track">{Array.from({ length: 28 }).map(() => <i />)}</div>
-              </div>
-              <p class="mside__code">
-                <span>{job.company}</span>
-                <span>{job.start.replace('-', '.')} — {active ? 'now' : job.end.replace('-', '.')}</span>
-              </p>
+              <Crt channel={num} class="mside__crt">
+                <span class="mside__crt-mark">{mark(job.company)}</span>
+                <span class="mside__crt-dates">{yy(job.start)}–{yy(job.end)}</span>
+              </Crt>
+              <Chevrons dir={i % 2 ? 'right' : 'left'} class="mside__chev" />
               <span class="mside__jp">{active ? '任務進行中' : '任務完了'}</span>
             </div>
           </li>
@@ -155,7 +170,26 @@ const { experience, copy, index } = Astro.props;
   }
 
   /* ── side panels: ZZZ-style lime tag, hatched slab, film strip, giant year ── */
-  .mside { position: relative; grid-row: 1; min-height: 380px; pointer-events: none; }
+  .mside { position: relative; grid-row: 1; min-height: 420px; pointer-events: none; }
+  :global(.mside__speed) { inset: -30px 0 -10px !important; width: calc(100% + var(--bleed)) !important; height: calc(100% + 40px) !important; z-index: 0; }
+  .mission--l :global(.mside__speed) { left: auto !important; right: calc(-1 * var(--bleed)) !important; }
+  .mission--r :global(.mside__speed) { left: calc(-1 * var(--bleed)) !important; }
+
+  :global(.mside__ticker) { position: absolute; bottom: 10px; color: var(--smoke); }
+  .mission--l :global(.mside__ticker) { left: 100px; right: var(--bleed); }
+  .mission--r :global(.mside__ticker) { right: 100px; left: var(--bleed); }
+
+  :global(.mside__crt) { position: absolute; top: 158px; width: 176px; z-index: 4; pointer-events: auto; }
+  .mission--l :global(.mside__crt) { left: 74px; rotate: -4deg; }
+  .mission--r :global(.mside__crt) { right: 74px; rotate: 4deg; }
+  .mside__crt-mark { font-size: 2.3rem; }
+  .mside__crt-dates { font-family: var(--f-ui); font-weight: 700; font-size: 0.62rem; letter-spacing: 0.14em; color: var(--paper); text-shadow: none; }
+
+  :global(.mside__chev) { position: absolute; top: 312px; width: 64%; z-index: 3; }
+  .mission--l :global(.mside__chev) { left: 0; clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 100%, 0 100%); }
+  .mission--r :global(.mside__chev) { right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 22px 100%); }
+
+  .mside__tag.is-impact { background: var(--asphalt); color: var(--volt); }
   .mission--l .mside { grid-column: 2; }
   .mission--r .mside { grid-column: 1; }
 
@@ -188,27 +222,7 @@ const { experience, copy, index } = Astro.props;
   .mside__label { font-weight: 700; font-size: var(--t-lg); line-height: 1; }
   .mside__num { font-size: clamp(4.5rem, 7vw, 6.5rem); line-height: 0.82; }
 
-  .mside__film {
-    position: absolute; top: 230px; z-index: 3;
-    width: 300px; height: 30px; overflow: hidden;
-    background: var(--asphalt);
-    box-shadow: 0 0 0 3px var(--asphalt);
-  }
-  .mission--l .mside__film { left: 6%; rotate: -34deg; }
-  .mission--r .mside__film { right: 6%; rotate: 34deg; }
-  .mside__film-track { display: flex; gap: 10px; padding: 7px 0; width: max-content; animation: film 6s linear infinite; }
-  .mission--r .mside__film-track { animation-direction: reverse; }
-  .mside__film i { width: 16px; height: 16px; background: var(--paper); flex: none; }
-  @keyframes film { to { transform: translateX(-26px); } }
 
-  .mside__code {
-    position: absolute; top: 270px; z-index: 2;
-    display: grid; gap: 2px;
-    font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--smoke);
-  }
-  .mission--l .mside__code { right: 0; text-align: right; }
-  .mission--r .mside__code { left: 0; }
-  .mside__code span:first-child { color: var(--paper); }
 
   .mside__jp {
     position: absolute; top: 22px; z-index: 3;

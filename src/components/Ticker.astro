@@ -1,0 +1,21 @@
+---
+/** Micro-text data ticker that scrolls endlessly. */
+interface Props { items: string[]; class?: string; reverse?: boolean }
+const { items, class: cls, reverse = false } = Astro.props;
+const run = [...items, ...items, ...items, ...items];
+---
+<div class:list={['ticker', reverse && 'ticker--rev', cls]} aria-hidden="true">
+  <div class="ticker__track">
+    {[0, 1].map(() => <span class="ticker__run">{run.map((t) => <span>{t}<b>▸</b></span>)}</span>)}
+  </div>
+</div>
+<style>
+  .ticker { overflow: hidden; white-space: nowrap; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+  .ticker__track { display: flex; width: max-content; animation: tick 28s linear infinite; }
+  .ticker--rev .ticker__track { animation-direction: reverse; }
+  .ticker__run { display: flex; }
+  .ticker__run > span { display: inline-flex; gap: 12px; padding-right: 12px; }
+  .ticker b { font-weight: 400; opacity: 0.6; }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker__track { animation: none; } }
+</style>

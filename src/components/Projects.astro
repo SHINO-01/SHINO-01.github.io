@@ -2,6 +2,8 @@
 import SectionHead from './SectionHead.astro';
 import Dots from './Dots.astro';
 import Icon from './Icon.astro';
+import Chevrons from './Chevrons.astro';
+import SpeedLines from './SpeedLines.astro';
 import { asset } from '../lib/data';
 import type { CollectionEntry } from 'astro:content';
 import type { SiteCopy } from '../lib/data';
@@ -19,14 +21,12 @@ const stars = { S: 5, A: 4, B: 3 } as const;
 
     <div class="projects__track" data-proj-track>
       <div class="projects__intro">
-        <div class="projects__slab" aria-hidden="true" data-proj-slab></div>
-        <div class="projects__film" aria-hidden="true" data-proj-film><div class="projects__film-track">{Array.from({ length: 30 }).map(() => <i />)}</div></div>
         <SectionHead id="projects-title" index={index} title={copy.title} kicker={copy.kicker} tone="light" jp={copy.jp} />
+        <SpeedLines fx={0.32} fy={0.42} tone="ink" class="projects__speed" />
         <p class="projects__lede">{copy.lede}</p>
-        <p class="projects__hint" aria-hidden="true">
-          <span class="projects__hint-key">Scroll</span> to browse
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
-        </p>
+        <div class="projects__conveyor" data-proj-slab>
+          <Chevrons dir="right" label={copy.scrollHint} />
+        </div>
       </div>
 
       {projects.map((p, i) => (
@@ -110,20 +110,18 @@ const stars = { S: 5, A: 4, B: 3 } as const;
   }
 
   .projects__intro { position: relative; }
-  .projects__slab {
-    position: absolute; left: calc(-1 * var(--gutter) - 10px); top: calc(100% + 56px);
-    width: 112%; height: 74px;
-    background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.07) 0 2px, transparent 2px 9px), var(--asphalt);
-    clip-path: polygon(0 0, 100% 0, calc(100% - 56px) 100%, 0 100%);
+  .projects__intro :global(.projects__speed) {
+    top: -160px !important; left: calc(-1 * var(--gutter)) !important;
+    width: calc(100% + var(--gutter) + 120px) !important; height: calc(100% + 320px) !important; z-index: -1;
+  }
+  .projects__conveyor {
+    position: relative; margin-top: 34px; margin-left: calc(-1 * var(--gutter));
+    width: calc(100% + var(--gutter) + 40px);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 26px) 100%, 0 100%);
     transform-origin: left;
   }
-  .projects__film {
-    position: absolute; left: 58%; top: calc(100% + 66px); width: 240px; height: 30px; overflow: hidden;
-    background: var(--asphalt); box-shadow: 0 0 0 3px var(--volt); rotate: -38deg;
-  }
-  .projects__film-track { display: flex; gap: 10px; padding: 7px 0; width: max-content; animation: pfilm 5s linear infinite; }
-  .projects__film i { width: 16px; height: 16px; background: var(--paper); flex: none; }
-  @keyframes pfilm { to { transform: translateX(-26px); } }
+  .projects__conveyor :global(.chev) { height: 46px; }
+  .projects__conveyor :global(.chev__label) { left: var(--gutter); font-size: 0.78rem; background: var(--volt); color: var(--asphalt); }
 
   .phud { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 30px; z-index: 2; height: 34px; pointer-events: none; }
   .phud__rule {
@@ -151,10 +149,6 @@ const stars = { S: 5, A: 4, B: 3 } as const;
   .projects__intro :global(.shead__title) { font-size: clamp(2.4rem, 4.6vw, 5rem); }
   .projects__intro :global(.shead__kicker) { color: rgb(16 16 19 / 0.7); }
   .projects__lede { font-size: var(--t-lg); line-height: 1.45; font-weight: 500; max-width: 32ch; }
-  .projects__hint { display: flex; align-items: center; gap: 10px; margin-top: 30px; font-weight: 700; font-size: var(--t-sm); }
-  .projects__hint-key { background: var(--asphalt); color: var(--volt); padding: 3px 10px; }
-  .projects__hint svg { width: 20px; animation: nudge 1.4s var(--ease-snap) infinite; }
-  @keyframes nudge { 50% { transform: translateX(6px); } }
 
   /* ── card ── */
   .pcard { --accent: var(--volt); --accent-ink: var(--asphalt); flex: none; width: clamp(330px, 31vw, 470px); perspective: 1200px; }
@@ -253,7 +247,7 @@ const stars = { S: 5, A: 4, B: 3 } as const;
     .projects__track { flex-direction: column; align-items: stretch; width: auto; padding-top: 100px; }
     .projects__intro, .pcard, .projects__more { width: 100%; }
     .projects__more { aspect-ratio: auto; min-height: 200px; }
-    .phud, .projects__hint, .projects__slab, .projects__film { display: none; }
+    .phud, .projects__conveyor, .projects__intro :global(.projects__speed) { display: none; }
     .projects__word { font-size: 9rem; bottom: auto; top: 60px; }
   }
 </style>

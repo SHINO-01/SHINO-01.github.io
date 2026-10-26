@@ -37,6 +37,8 @@ export function heroIntro() {
     .to($$('[data-sticker]', h), { scale: 1, rotate: 0, duration: 0.7, ease: 'back.out(2.2)', stagger: 0.1 }, 1)
     .to($$('[data-hero-tapes] .tape'), { yPercent: 0, duration: 0.9, stagger: 0.08, ease: 'power4.out' }, 0.7)
     .add(() => { gsap.set($('[data-hero-portrait]', h), { clearProps: 'filter' }); });
+  // Play the whole intro ~35% slower so each beat reads clearly.
+  tl.timeScale(0.74);
   return tl;
 }
 

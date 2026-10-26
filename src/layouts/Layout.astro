@@ -35,6 +35,8 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
         var html = document.documentElement;
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         html.classList.add('motion', 'is-loading');
+        // Hold any #section link until the animations are set up, so the browser doesn't jump there first.
+        if (location.hash) { window.__hash = location.hash; history.replaceState(null, '', location.pathname + location.search); }
         // Safety net: if scripts fail to load, never leave the page hidden behind the loader.
         setTimeout(function () { if (!window.__booted) html.classList.remove('motion', 'is-loading'); }, 4000);
       })();
