@@ -173,6 +173,21 @@ function missions() {
       .from($$('.mission__list li, .mission__stack li', card), { y: 14, opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }, 0.35)
       .from($('[data-stamp]', card), { scale: 2.6, opacity: 0, rotate: -30, duration: 0.35, ease: 'power4.in' }, 0.6)
       .to(card, { x: '+=6', duration: 0.05, repeat: 3, yoyo: true, ease: 'none' });
+
+    // side panel: slab, tag and film strip slam in from the screen edge
+    const side = $('[data-mside]', m);
+    if (side) {
+      const dir = m.classList.contains('mission--l') ? 1 : -1;
+      tl.from($('[data-mside-hatch]', side), { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 0.1)
+        .from($('[data-mside-tag]', side), { xPercent: 70 * dir, skewX: -18 * dir, opacity: 0, duration: 0.8, ease: 'expo.out' }, 0.2)
+        .from($('.mside__num', side), { yPercent: 60, opacity: 0, duration: 0.6, ease: 'back.out(2)' }, 0.45)
+        .from($('[data-mside-film]', side), { scaleX: 0, duration: 0.6, ease: 'expo.out' }, 0.4)
+        .from($$('.mside__code, .mside__jp', side), { opacity: 0, y: 12, duration: 0.5, stagger: 0.08 }, 0.55);
+      gsap.fromTo($('[data-mside-year]', side), { yPercent: 35 }, {
+        yPercent: -35, ease: 'none',
+        scrollTrigger: { trigger: m, start: 'top bottom', end: 'bottom top', scrub: 0.6 },
+      });
+    }
   });
 }
 

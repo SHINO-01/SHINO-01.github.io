@@ -37,7 +37,7 @@
     - Shipped a monetised, local-first Kanban app to the Chrome Web Store with cross-device sync and payments.
     - DOM-parsing extracts job metadata from diverse career portals and auto-fills application forms.
     - Parses forwarded application emails to move cards between stages automatically.
-  stack: [Google Chrome, Kanban, Payments, Email parsing]
+  stack: [TypeScript, React, WXT, Supabase, Paddle, Cloudflare Workers, Tailwind CSS]
   links:
     - label: Website
       url: https://rolestash.com

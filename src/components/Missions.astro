@@ -18,11 +18,12 @@ const { experience, index } = Astro.props;
     <ol class="log">
       {experience.map((job, i) => {
         const active = job.end === 'present';
+        const num = String(experience.length - i).padStart(2, '0');
         return (
           <li class:list={['mission', i % 2 ? 'mission--r' : 'mission--l']} data-mission>
             <div class="mission__node" aria-hidden="true" data-mission-node>
               <svg viewBox="0 0 40 46"><path d="M20 2 38 12.5v21L20 44 2 33.5v-21Z" /></svg>
-              <span>{String(experience.length - i).padStart(2, '0')}</span>
+              <span>{num}</span>
             </div>
             <article class="mission__card" data-mission-card>
               <header class="mission__head">
@@ -49,6 +50,24 @@ const { experience, index } = Astro.props;
               )}
               <span class="mission__stamp display" aria-hidden="true" data-stamp>{active ? 'In progress' : 'Cleared'}</span>
             </article>
+
+            {/* decorative panel that fills the empty side of the timeline */}
+            <div class="mside" aria-hidden="true" data-mside>
+              <span class="mside__year display" data-mside-year>{job.start.slice(0, 4)}</span>
+              <div class="mside__hatch" data-mside-hatch></div>
+              <div class="mside__tag" data-mside-tag>
+                <span class="mside__label">Mission</span>
+                <span class="mside__num display">{num}</span>
+              </div>
+              <div class="mside__film" data-mside-film>
+                <div class="mside__film-track">{Array.from({ length: 28 }).map(() => <i />)}</div>
+              </div>
+              <p class="mside__code">
+                <span>{job.company}</span>
+                <span>{job.start.replace('-', '.')} — {active ? 'now' : job.end.replace('-', '.')}</span>
+              </p>
+              <span class="mside__jp">{active ? '任務進行中' : '任務完了'}</span>
+            </div>
           </li>
         );
       })}
@@ -65,7 +84,11 @@ const { experience, index } = Astro.props;
       linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px) 0 0 / 100% 48px,
       var(--asphalt);
   }
-  .missions__inner { max-width: 1320px; margin: 0 auto; }
+  .missions__inner {
+    max-width: 1320px; margin: 0 auto;
+    /* distance from the content edge to the viewport edge, so side panels can bleed off-screen */
+    --bleed: max(var(--gutter), calc((100vw - 1320px) / 2));
+  }
 
   .log-wrap { position: relative; }
   .log { position: relative; display: grid; gap: clamp(28px, 4vw, 48px); padding: 0; list-style: none; }
@@ -130,7 +153,72 @@ const { experience, index } = Astro.props;
     padding: 4px 10px; border: 3px solid rgb(215 255 31 / 0.35);
   }
 
+  /* ── side panels: ZZZ-style lime tag, hatched slab, film strip, giant year ── */
+  .mside { position: relative; grid-row: 1; min-height: 380px; pointer-events: none; }
+  .mission--l .mside { grid-column: 2; }
+  .mission--r .mside { grid-column: 1; }
+
+  .mside__year {
+    position: absolute; bottom: -10px; z-index: 0;
+    font-size: clamp(6rem, 11vw, 10.5rem); line-height: 0.8;
+    color: transparent; -webkit-text-stroke: 2px rgb(241 240 234 / 0.08);
+  }
+  .mission--l .mside__year { right: 0; }
+  .mission--r .mside__year { left: 0; }
+
+  .mside__hatch {
+    position: absolute; top: 118px; height: 132px; z-index: 1;
+    width: calc(88% + var(--bleed));
+    background:
+      repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 9px),
+      #1f2026;
+  }
+  .mission--l .mside__hatch { right: calc(-1 * var(--bleed)); clip-path: polygon(70px 0, 100% 0, 100% 100%, 0 100%); transform-origin: right; }
+  .mission--r .mside__hatch { left: calc(-1 * var(--bleed)); clip-path: polygon(0 0, 100% 0, calc(100% - 70px) 100%, 0 100%); transform-origin: left; }
+
+  .mside__tag {
+    position: absolute; top: 22px; z-index: 2;
+    width: calc(64% + var(--bleed)); height: 150px;
+    display: grid; align-content: center;
+    background: var(--volt); color: var(--asphalt);
+  }
+  .mission--l .mside__tag { right: calc(-1 * var(--bleed)); padding-left: 84px; clip-path: polygon(64px 0, 100% 0, 100% 100%, 0 100%); }
+  .mission--r .mside__tag { left: calc(-1 * var(--bleed)); padding-right: 84px; justify-items: end; text-align: right; clip-path: polygon(0 0, 100% 0, calc(100% - 64px) 100%, 0 100%); }
+  .mside__label { font-weight: 700; font-size: var(--t-lg); line-height: 1; }
+  .mside__num { font-size: clamp(4.5rem, 7vw, 6.5rem); line-height: 0.82; }
+
+  .mside__film {
+    position: absolute; top: 230px; z-index: 3;
+    width: 300px; height: 30px; overflow: hidden;
+    background: var(--asphalt);
+    box-shadow: 0 0 0 3px var(--asphalt);
+  }
+  .mission--l .mside__film { left: 6%; rotate: -34deg; }
+  .mission--r .mside__film { right: 6%; rotate: 34deg; }
+  .mside__film-track { display: flex; gap: 10px; padding: 7px 0; width: max-content; animation: film 6s linear infinite; }
+  .mission--r .mside__film-track { animation-direction: reverse; }
+  .mside__film i { width: 16px; height: 16px; background: var(--paper); flex: none; }
+  @keyframes film { to { transform: translateX(-26px); } }
+
+  .mside__code {
+    position: absolute; top: 270px; z-index: 2;
+    display: grid; gap: 2px;
+    font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--smoke);
+  }
+  .mission--l .mside__code { right: 0; text-align: right; }
+  .mission--r .mside__code { left: 0; }
+  .mside__code span:first-child { color: var(--paper); }
+
+  .mside__jp {
+    position: absolute; top: 22px; z-index: 3;
+    writing-mode: vertical-rl;
+    font-family: var(--f-display); font-size: 0.95rem; letter-spacing: 0.3em; color: var(--volt);
+  }
+  .mission--l .mside__jp { left: 40px; }
+  .mission--r .mside__jp { right: 40px; }
+
   @media (max-width: 900px) {
+    .mside { display: none; }
     .log__spine { left: 18px; }
     .mission { grid-template-columns: 1fr; gap: 0; padding-left: 52px; }
     .mission--l .mission__card, .mission--r .mission__card { grid-column: 1; }
