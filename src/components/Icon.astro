@@ -1,0 +1,20 @@
+---
+import { iconFor, monogram } from '../lib/icons';
+interface Props { name: string; class?: string; brand?: boolean }
+const { name, class: cls, brand = false } = Astro.props;
+const icon = iconFor(name);
+---
+{icon ? (
+  <svg class={cls} viewBox="0 0 24 24" aria-hidden="true" fill={brand ? `#${icon.hex}` : 'currentColor'} data-brand={`#${icon.hex}`}>
+    <path d={icon.path} />
+  </svg>
+) : (
+  <span class:list={[cls, 'icon-mono']} aria-hidden="true">{monogram(name)}</span>
+)}
+<style>
+  .icon-mono {
+    display: inline-grid; place-items: center;
+    font-family: var(--f-display); font-size: 0.55em; line-height: 1;
+    aspect-ratio: 1; min-width: 1.6em;
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+/** Section heading: vertical index tab + giant title + plain-language subtitle. */
+interface Props { id: string; index: string; title: string; kicker: string; tone?: 'light' | 'dark'; jp?: string }
+const { id, index, title, kicker, tone = 'dark', jp } = Astro.props;
+---
+<header class:list={['shead', `shead--${tone}`]} data-shead>
+  <div class="shead__tab" data-shead-tab><span class="shead__num display">{index}</span></div>
+  <div class="shead__body">
+    <p class="shead__kicker" data-shead-kicker>{kicker}</p>
+    <h2 class="shead__title display" id={id} data-split>{title}</h2>
+    {jp && <span class="shead__jp" aria-hidden="true">{jp}</span>}
+  </div>
+</header>
+<style>
+  .shead { position: relative; display: flex; align-items: stretch; gap: clamp(14px, 2vw, 28px); margin-bottom: clamp(40px, 6vw, 80px); }
+  .shead__tab {
+    flex: none; display: grid; place-items: center;
+    width: clamp(54px, 6vw, 84px);
+    background: var(--volt); color: var(--asphalt);
+    clip-path: polygon(0 0, 100% 0, 100% 78%, 70% 100%, 0 100%);
+  }
+  .shead--light .shead__tab { background: var(--asphalt); color: var(--volt); }
+  .shead__num { font-size: clamp(1.4rem, 2.6vw, 2.2rem); writing-mode: vertical-rl; rotate: 180deg; }
+  .shead__body { position: relative; padding-top: 4px; }
+  .shead__kicker { font-size: var(--t-sm); font-weight: 600; letter-spacing: 0.06em; color: var(--smoke); margin-bottom: 10px; }
+  .shead--light .shead__kicker { color: #5d5f68; }
+  .shead__title { font-size: var(--t-3xl); line-height: 0.88; }
+  .shead__title :global(.char) { display: inline-block; will-change: transform; }
+  .shead__jp {
+    position: absolute; right: -0.2em; top: -0.35em; z-index: -1;
+    font-family: var(--f-display); font-size: clamp(3rem, 9vw, 8rem); line-height: 1;
+    color: transparent; -webkit-text-stroke: 1.5px currentColor; opacity: 0.18;
+    white-space: nowrap; pointer-events: none;
+    transform: translateX(100%);
+  }
+</style>

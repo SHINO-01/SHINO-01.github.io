@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "src/components/Nav.astro"
+        ],
+        "createdAt": "2026-10-26T13:55:05.093Z",
+        "reason": "Claude triage: nav pill is an absolutely positioned indicator whose width must match each tab label; animating width only reflows the pill itself, on section change. Rail width animation was replaced with translate."
+      }
+    ]
+  }
+}

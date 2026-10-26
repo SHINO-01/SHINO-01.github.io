@@ -1,0 +1,146 @@
+---
+import SectionHead from './SectionHead.astro';
+import { fmtMonth } from '../lib/data';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  education: CollectionEntry<'education'>['data'][];
+  publications: CollectionEntry<'publications'>['data'][];
+  index: string;
+}
+const { education, publications, index } = Astro.props;
+const CIRC = 2 * Math.PI * 52;
+// deterministic barcode from a string
+const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c) => (c.charCodeAt(0) % 3) + 1);
+---
+<section class="records" id="records" aria-labelledby="records-title">
+  <div class="records__inner">
+    <SectionHead id="records-title" index={index} title="Records" kicker="Education and published research" tone="light" jp="記録" />
+
+    <div class="records__grid">
+      <div class="records__col">
+        <h3 class="records__label">Achievements</h3>
+        {publications.map((pub) => (
+          <article class="trophy" data-trophy>
+            <div class="trophy__banner"><span>Achievement unlocked</span><span>{pub.year}</span></div>
+            <div class="trophy__body">
+              {pub.metric && (
+                <div class="gauge" data-gauge={pub.metric.value}>
+                  <svg viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="52" class="gauge__track" />
+                    <circle cx="60" cy="60" r="52" class="gauge__fill" style={`stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC * (1 - pub.metric.value / 100)}`} data-gauge-fill data-circ={CIRC} />
+                    {Array.from({ length: 40 }).map((_, i) => <line x1="60" y1="2" x2="60" y2={i % 5 ? 6 : 9} transform={`rotate(${i * 9} 60 60)`} class="gauge__tick" />)}
+                  </svg>
+                  <div class="gauge__val"><span class="display" data-count={pub.metric.value}>{pub.metric.value}</span><small>%</small></div>
+                  <p class="gauge__label">{pub.metric.label}</p>
+                </div>
+              )}
+              <div class="trophy__text">
+                <h4 class="trophy__title">{pub.title}</h4>
+                <p class="trophy__venue">{pub.venue}</p>
+                <ul class="trophy__list">{pub.highlights.map((h) => <li>{h}</li>)}</ul>
+                {pub.url && (
+                  <a class="btn trophy__link" href={pub.url} target="_blank" rel="noopener">
+                    <span>Read the paper</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                  </a>
+                )}
+              </div>
+            </div>
+            <div class="trophy__shine" aria-hidden="true"></div>
+          </article>
+        ))}
+      </div>
+
+      <div class="records__col">
+        <h3 class="records__label">Training</h3>
+        <ol class="ids">
+          {education.map((ed) => {
+            const ongoing = ed.end === 'present';
+            return (
+              <li class="idcard" data-idcard>
+                <div class="idcard__side" aria-hidden="true">
+                  <span>{ongoing ? 'In progress' : 'Completed'}</span>
+                </div>
+                <div class="idcard__main">
+                  <p class="idcard__inst">{ed.institution}</p>
+                  <h4 class="idcard__qual display">{ed.qualification}</h4>
+                  {ed.focus && <p class="idcard__focus">{ed.focus}</p>}
+                  <dl class="idcard__meta">
+                    <div><dt>Period</dt><dd>{fmtMonth(ed.start)} – {fmtMonth(ed.end)}</dd></div>
+                    {ed.location && <div><dt>Location</dt><dd>{ed.location}</dd></div>}
+                  </dl>
+                  {ed.notes.length > 0 && <ul class="idcard__notes">{ed.notes.map((n) => <li>{n}</li>)}</ul>}
+                  <div class="idcard__code" aria-hidden="true">
+                    {bars(ed.institution + ed.qualification).map((w) => <i style={`width:${w * 2}px`}></i>)}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .records {
+    position: relative; z-index: 2;
+    background: var(--paper); color: var(--asphalt);
+    padding: clamp(100px, 12vw, 160px) var(--gutter);
+  }
+  .records__inner { max-width: 1320px; margin: 0 auto; }
+  .records__grid { display: grid; grid-template-columns: 7fr 5fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
+  .records__col { display: grid; gap: 20px; }
+  .records__label { font-family: var(--f-ui); font-weight: 700; font-size: var(--t-sm); letter-spacing: 0.12em; text-transform: uppercase; padding-bottom: 8px; border-bottom: 2px solid var(--asphalt); }
+
+  /* trophy */
+  .trophy { position: relative; background: var(--asphalt); color: var(--paper); clip-path: var(--chamfer); --cut: 24px; overflow: hidden; }
+  .trophy__banner {
+    display: flex; justify-content: space-between;
+    padding: 10px 22px; background: var(--ether); color: var(--paper);
+    font-weight: 700; font-size: var(--t-xs); letter-spacing: 0.16em; text-transform: uppercase;
+  }
+  .trophy__body { display: grid; grid-template-columns: auto 1fr; gap: clamp(20px, 3vw, 36px); padding: clamp(22px, 3vw, 34px); align-items: start; }
+  .gauge { position: relative; width: clamp(130px, 13vw, 170px); display: grid; justify-items: center; gap: 8px; }
+  .gauge svg { width: 100%; rotate: -90deg; overflow: visible; }
+  .gauge__track { fill: none; stroke: var(--steel); stroke-width: 10; }
+  .gauge__fill { fill: none; stroke: var(--volt); stroke-width: 10; stroke-linecap: butt; }
+  .gauge__tick { stroke: var(--smoke); stroke-width: 1.5; }
+  .gauge__val { position: absolute; top: 0; left: 0; right: 0; aspect-ratio: 1; display: grid; place-items: center; grid-auto-flow: column; align-content: center; justify-content: center; }
+  .gauge__val .display { font-size: clamp(2.2rem, 3.4vw, 3rem); line-height: 1; color: var(--volt); }
+  .gauge__val small { font-weight: 700; font-size: var(--t-md); align-self: start; margin-top: 0.3em; }
+  .gauge__label { text-align: center; font-size: var(--t-xs); font-weight: 600; color: var(--smoke); max-width: 16ch; line-height: 1.35; }
+  .trophy__title { font-family: var(--f-ui); font-weight: 700; font-size: var(--t-lg); line-height: 1.3; }
+  .trophy__venue { margin-top: 8px; color: #b9a1ff; font-size: var(--t-sm); font-weight: 600; }
+  .trophy__list { display: grid; gap: 8px; margin: 16px 0 22px; font-size: var(--t-sm); color: #cfcfc8; }
+  .trophy__list li { position: relative; padding-left: 16px; }
+  .trophy__list li::before { content: ''; position: absolute; left: 0; top: 0.65em; width: 7px; height: 2px; background: var(--volt); }
+  .trophy__shine { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 40%, rgb(255 255 255 / 0.14) 50%, transparent 60%); transform: translateX(-100%); }
+
+  /* id cards */
+  .ids { display: grid; gap: 16px; padding: 0; list-style: none; }
+  .idcard { display: grid; grid-template-columns: 40px 1fr; background: var(--concrete); clip-path: var(--chamfer); --cut: 18px; box-shadow: inset 0 0 0 2px var(--asphalt); transition: translate 0.35s var(--ease-out); }
+  .idcard:hover { translate: 6px 0; }
+  .idcard__side { background: var(--asphalt); color: var(--volt); display: grid; place-items: center; }
+  .idcard__side span { writing-mode: vertical-rl; rotate: 180deg; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; }
+  .idcard__main { position: relative; padding: 20px 22px 18px; }
+  .idcard__inst { font-weight: 700; font-size: var(--t-sm); color: var(--ether); }
+  .idcard__qual { font-size: clamp(1.25rem, 1.9vw, 1.6rem); line-height: 1.05; margin-top: 6px; }
+  .idcard__focus { margin-top: 6px; font-weight: 600; }
+  .idcard__meta { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 14px 0 0; }
+  .idcard__meta dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #5d5f68; }
+  .idcard__meta dd { margin: 0; font-weight: 600; font-size: var(--t-sm); }
+  .idcard__notes { margin-top: 10px; font-size: var(--t-sm); }
+  .idcard__code { display: flex; gap: 2px; height: 22px; margin-top: 16px; opacity: 0.8; }
+  .idcard__code i { background: var(--asphalt); }
+
+  @media (max-width: 960px) {
+    .records__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .trophy__body { grid-template-columns: 1fr; justify-items: start; }
+    .idcard__code { display: none; }
+  }
+</style>

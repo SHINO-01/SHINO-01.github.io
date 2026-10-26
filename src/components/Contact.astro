@@ -1,0 +1,136 @@
+---
+import Icon from './Icon.astro';
+import Tape from './Tape.astro';
+import { asset } from '../lib/data';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { profile: CollectionEntry<'profile'>['data']; index: string }
+const { profile: p, index } = Astro.props;
+const year = new Date().getFullYear();
+---
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="contact__marquee" aria-hidden="true" data-marquee>
+    <div class="contact__marquee-track" data-marquee-track>
+      {[0, 1].map(() => (
+        <span class="contact__marquee-run display">Let's build something <i>✦</i> Let's build something <i>✦</i> </span>
+      ))}
+    </div>
+  </div>
+
+  <div class="contact__inner">
+    <div class="contact__tab display" aria-hidden="true">{index}</div>
+    <div class="contact__copy">
+      <h2 class="contact__title display" id="contact-title" data-split>Got a role or a project in mind?</h2>
+      <p class="contact__lede">
+        I'm based in {p.location} and open to AI engineering and software engineering work, on-site or remote.
+        The fastest way to reach me is email.
+      </p>
+    </div>
+
+    <div class="contact__actions">
+      <a class="mailbox" href={`mailto:${p.email}`} data-magnetic>
+        <span class="mailbox__label">Email me</span>
+        <span class="mailbox__addr">{p.email}</span>
+        <span class="mailbox__hint">Opens your mail app</span>
+        <svg class="mailbox__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+      </a>
+      <div class="contact__row">
+        <button class="btn btn--ghost" type="button" data-copy-btn={p.email}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="8" y="8" width="12" height="12" /><path d="M16 8V4H4v12h4" /></svg>
+          <span data-copy-label>Copy email</span>
+        </button>
+        {p.cv && (
+          <a class="btn" href={asset(p.cv)} download data-magnetic>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 20h16" /></svg>
+            <span>Download CV</span>
+          </a>
+        )}
+      </div>
+      <ul class="contact__socials">
+        {p.socials.map((s) => (
+          <li>
+            <a href={s.url} target="_blank" rel="noopener">
+              <Icon name={s.icon} />
+              <span>{s.label}</span>
+              <svg class="contact__ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="contact__langs">Speaks {p.spokenLanguages.join(' and ')}</p>
+    </div>
+  </div>
+
+  <div class="contact__tape"><Tape items={['Thanks for visiting', p.codename, p.title]} tone="ether" angle={-2} /></div>
+
+  <footer class="footer">
+    <span>© {year} {p.name}</span>
+    <span>Built with Astro and GSAP. Hosted on GitHub Pages.</span>
+    <a href="#agent" class="footer__top" data-scramble>Back to top</a>
+  </footer>
+  <p class="sr-only" role="status" aria-live="polite" data-copy-status></p>
+</section>
+
+<style>
+  .contact { position: relative; background: var(--asphalt); overflow: clip; padding-top: clamp(40px, 6vw, 80px); }
+  .contact__marquee { overflow: hidden; padding: 10px 0 0; }
+  .contact__marquee-track { display: flex; width: max-content; will-change: transform; }
+  .contact__marquee-run { flex: none; font-size: clamp(4rem, 13vw, 12rem); line-height: 1; white-space: nowrap; color: transparent; -webkit-text-stroke: 2px var(--steel); padding-right: 0.3em; }
+  .contact__marquee-run i { font-style: normal; color: var(--volt); -webkit-text-stroke: 0; font-size: 0.5em; vertical-align: middle; }
+
+  .contact__inner {
+    max-width: 1320px; margin: 0 auto; padding: clamp(40px, 6vw, 80px) var(--gutter) clamp(80px, 9vw, 120px);
+    display: grid; grid-template-columns: auto 5fr 5fr; gap: clamp(20px, 4vw, 60px); align-items: start;
+  }
+  .contact__tab {
+    width: clamp(54px, 6vw, 84px); height: 140px; display: grid; place-items: center;
+    background: var(--volt); color: var(--asphalt); font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+    writing-mode: vertical-rl; rotate: 180deg;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 30% 100%, 0 78%);
+  }
+  .contact__title { font-size: clamp(2.3rem, 4.4vw, 4.3rem); line-height: 0.95; }
+  .contact__title :global(.char) { display: inline-block; }
+  .contact__lede { margin-top: 24px; max-width: 48ch; font-size: var(--t-lg); color: #c9c9c2; line-height: 1.5; }
+
+  .contact__actions { display: grid; gap: 18px; }
+  .mailbox {
+    position: relative; display: grid; gap: 6px;
+    padding: 26px 70px 24px 26px;
+    background: var(--volt); color: var(--asphalt);
+    clip-path: var(--chamfer); --cut: 22px;
+    transition: background-color 0.3s;
+  }
+  .mailbox:hover { background: var(--paper); }
+  .mailbox__label { font-weight: 700; font-size: var(--t-xs); letter-spacing: 0.16em; text-transform: uppercase; }
+  .mailbox__addr { font-family: var(--f-display); font-size: clamp(1rem, 1.55vw, 1.4rem); overflow-wrap: anywhere; line-height: 1.15; }
+  .mailbox__hint { font-size: var(--t-xs); font-weight: 600; opacity: 0.7; }
+  .mailbox__arrow { position: absolute; right: 22px; top: 24px; width: 34px; height: 34px; transition: transform 0.4s var(--ease-out); }
+  .mailbox:hover .mailbox__arrow { transform: translate(4px, -4px) rotate(8deg); }
+  .contact__row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .contact__socials { display: grid; border-top: 1px solid var(--steel); }
+  .contact__socials a {
+    display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 14px;
+    padding: 14px 4px; border-bottom: 1px solid var(--steel);
+    font-weight: 600; transition: color 0.25s;
+  }
+  .contact__socials a > * { transition: translate 0.35s var(--ease-out); }
+  .contact__socials a:hover { color: var(--volt); }
+  .contact__socials a:hover > * { translate: 8px 0; }
+  .contact__socials :global(svg) { width: 20px; height: 20px; }
+  .contact__ext { width: 16px !important; height: 16px !important; color: var(--smoke); }
+  .contact__langs { font-size: var(--t-sm); color: var(--smoke); }
+
+  .contact__tape { padding: 20px 0 30px; }
+  .footer {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
+    padding: 22px var(--gutter) 28px; border-top: 1px solid var(--steel);
+    font-size: var(--t-sm); color: var(--smoke);
+  }
+  .footer__top { color: var(--paper); font-weight: 700; }
+  .footer__top:hover { color: var(--volt); }
+
+  @media (max-width: 960px) {
+    .contact__inner { grid-template-columns: 1fr; }
+    .contact__tab { display: none; }
+  }
+</style>

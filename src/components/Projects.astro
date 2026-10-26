@@ -1,0 +1,208 @@
+---
+import SectionHead from './SectionHead.astro';
+import Icon from './Icon.astro';
+import { asset } from '../lib/data';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { projects: CollectionEntry<'projects'>['data'][]; index: string; github?: string }
+const { projects, index, github } = Astro.props;
+const stars = { S: 5, A: 4, B: 3 } as const;
+---
+<section class="projects" id="projects" aria-labelledby="projects-title" data-projects>
+  <div class="projects__bg halftone" aria-hidden="true"></div>
+  <div class="projects__pin" data-proj-pin>
+    <div class="projects__track" data-proj-track>
+      <div class="projects__intro">
+        <SectionHead id="projects-title" index={index} title="Projects" kicker="Things I've designed, built and shipped" tone="light" jp="作品" />
+        <p class="projects__lede">
+          Open-source frameworks, a product on the Chrome Web Store and distributed systems built to survive outages.
+        </p>
+        <p class="projects__hint" aria-hidden="true">
+          <span class="projects__hint-key">Scroll</span> to browse
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+        </p>
+      </div>
+
+      {projects.map((p, i) => (
+        <article class:list={['pcard', `pcard--${p.color}`]} data-pcard>
+          <div class="pcard__inner" data-tilt>
+            <div class="pcard__art" aria-hidden="true">
+              {p.image ? <img src={asset(p.image)} alt="" loading="lazy" /> : (
+                <>
+                  <div class="pcard__stripes"></div>
+                  <span class="pcard__glyph display" data-depth="30">{p.glyph ?? p.name.slice(0, 2)}</span>
+                  <span class="pcard__glyph pcard__glyph--echo display" data-depth="12">{p.glyph ?? p.name.slice(0, 2)}</span>
+                </>
+              )}
+              <div class="pcard__scan"></div>
+              <span class="pcard__no">No.{String(i + 1).padStart(3, '0')}</span>
+              <div class="pcard__rank" data-depth="40">
+                <span class="display">{p.rank}</span>
+                <span class="pcard__stars">{'★'.repeat(stars[p.rank])}</span>
+              </div>
+              <div class="pcard__holo"></div>
+            </div>
+            <div class="pcard__body">
+              <header>
+                <h3 class="pcard__name display">{p.name}</h3>
+                <p class="pcard__tagline">{p.tagline}{p.year && <span> · {p.year}</span>}</p>
+              </header>
+              <ul class="pcard__list">
+                {p.highlights.map((h) => <li>{h}</li>)}
+              </ul>
+              <ul class="pcard__stack" aria-label="Built with">
+                {p.stack.map((t) => <li title={t}><Icon name={t} /><span>{t}</span></li>)}
+              </ul>
+              {p.links.length > 0 && (
+                <div class="pcard__links">
+                  {p.links.map((l, j) => (
+                    <a class:list={['pcard__link', j === 0 && 'is-primary']} href={l.url} target="_blank" rel="noopener">
+                      {l.label}
+                      <span class="sr-only"> for {p.name} (opens in a new tab)</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" /></svg>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </article>
+      ))}
+
+      {github && (
+        <a class="projects__more" href={github} target="_blank" rel="noopener" data-magnetic>
+          <Icon name="github" />
+          <span class="display">More on GitHub</span>
+          <span class="projects__more-sub">Experiments, coursework and works in progress</span>
+        </a>
+      )}
+    </div>
+  </div>
+  <div class="projects__progress" aria-hidden="true"><i data-proj-progress></i></div>
+</section>
+
+<style>
+  .projects {
+    position: relative; z-index: 2;
+    background: var(--volt); color: var(--asphalt);
+    overflow: clip;
+  }
+  .projects__bg { position: absolute; inset: 0; color: var(--asphalt); opacity: 0.1; -webkit-mask-image: linear-gradient(110deg, transparent 20%, #000 70%); mask-image: linear-gradient(110deg, transparent 20%, #000 70%); }
+  .projects__pin { min-height: 100svh; display: flex; align-items: center; }
+  .projects__track {
+    display: flex; align-items: center; gap: clamp(20px, 2.4vw, 36px);
+    padding: 110px var(--gutter) 90px;
+    width: max-content;
+    will-change: transform;
+  }
+  .projects__intro { width: clamp(380px, 44vw, 640px); flex: none; align-self: center; }
+  .projects__intro :global(.shead__title) { font-size: clamp(2.4rem, 4.6vw, 5rem); }
+  .projects__intro :global(.shead__kicker) { color: rgb(16 16 19 / 0.7); }
+  .projects__lede { font-size: var(--t-lg); line-height: 1.45; font-weight: 500; max-width: 32ch; }
+  .projects__hint { display: flex; align-items: center; gap: 10px; margin-top: 30px; font-weight: 700; font-size: var(--t-sm); }
+  .projects__hint-key { background: var(--asphalt); color: var(--volt); padding: 3px 10px; }
+  .projects__hint svg { width: 20px; animation: nudge 1.4s var(--ease-snap) infinite; }
+  @keyframes nudge { 50% { transform: translateX(6px); } }
+
+  /* ── card ── */
+  .pcard { --accent: var(--volt); --accent-ink: var(--asphalt); flex: none; width: clamp(330px, 31vw, 470px); perspective: 1200px; }
+  .pcard--ether { --accent: var(--ether); --accent-ink: var(--paper); }
+  .pcard--hazard { --accent: var(--hazard); --accent-ink: var(--asphalt); }
+  .pcard--cyan { --accent: var(--cyan); --accent-ink: var(--asphalt); }
+  .pcard__inner {
+    --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+    position: relative;
+    background: var(--asphalt); color: var(--paper);
+    clip-path: var(--chamfer); --cut: 26px;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .pcard__inner.is-tilting { transition: none; }
+
+  .pcard__art {
+    position: relative; height: clamp(150px, 22vh, 230px); overflow: hidden;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .pcard__art img { width: 100%; height: 100%; object-fit: cover; }
+  .pcard__stripes {
+    position: absolute; inset: 0; opacity: 0.18;
+    background: repeating-linear-gradient(-45deg, currentColor 0 2px, transparent 2px 14px);
+  }
+  .pcard__glyph {
+    position: absolute; left: 6%; bottom: -0.16em;
+    font-size: clamp(6rem, 10vw, 9.5rem); line-height: 1;
+    color: var(--asphalt);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .pcard--ether .pcard__glyph { color: var(--paper); }
+  .pcard__glyph--echo { color: transparent !important; -webkit-text-stroke: 2px currentColor; translate: 14px -12px; opacity: 0.6; z-index: 0; }
+  .pcard--ether .pcard__glyph--echo { -webkit-text-stroke-color: var(--paper); }
+  .pcard__glyph--echo { -webkit-text-stroke-color: var(--asphalt); }
+  .pcard__scan { position: absolute; inset: 0; background: repeating-linear-gradient(transparent 0 3px, rgb(0 0 0 / 0.08) 3px 4px); pointer-events: none; }
+  .pcard__no { position: absolute; left: 16px; top: 14px; font-weight: 700; font-size: var(--t-xs); letter-spacing: 0.14em; }
+  .pcard__rank {
+    position: absolute; right: 16px; top: 12px; display: grid; justify-items: end;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .pcard__rank .display { font-size: 3.4rem; line-height: 0.9; color: var(--asphalt); -webkit-text-stroke: 0; text-shadow: 3px 3px 0 var(--paper); }
+  .pcard--ether .pcard__rank .display { color: var(--paper); text-shadow: 3px 3px 0 var(--asphalt); }
+  .pcard__stars { font-size: 0.8rem; letter-spacing: 2px; }
+  .pcard__holo {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: color-dodge;
+    background:
+      radial-gradient(circle at var(--mx) var(--my), rgb(255 255 255 / 0.65), transparent 40%),
+      linear-gradient(115deg, transparent 20%, #ff4fd8 35%, #4fffe0 50%, #fff95c 65%, transparent 80%);
+    background-size: 100% 100%, 250% 250%;
+    background-position: center, var(--mx) var(--my);
+    transition: opacity 0.4s;
+  }
+  .pcard__inner:hover .pcard__holo { opacity: 0.55; }
+
+  .pcard__body { padding: 22px 24px 24px; display: grid; gap: 14px; }
+  .pcard__name { font-size: clamp(1.7rem, 2.4vw, 2.2rem); line-height: 1; }
+  .pcard__tagline { margin-top: 6px; color: var(--accent); font-weight: 600; font-size: var(--t-sm); }
+  .pcard--ether .pcard__tagline { color: #b9a1ff; }
+  .pcard__list { display: grid; gap: 7px; font-size: 0.9rem; line-height: 1.45; color: #cfcfc8; }
+  .pcard__list li { position: relative; padding-left: 16px; }
+  .pcard__list li::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 7px; height: 2px; background: var(--accent); }
+  .pcard__stack { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pcard__stack li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; background: var(--steel); font-size: var(--t-xs); font-weight: 600; }
+  .pcard__stack :global(svg), .pcard__stack :global(.icon-mono) { width: 13px; height: 13px; }
+  .pcard__links { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; }
+  .pcard__link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 12px; font-weight: 700; font-size: var(--t-sm);
+    box-shadow: inset 0 0 0 2px var(--steel);
+    transition: background-color 0.25s, color 0.25s, box-shadow 0.25s;
+  }
+  .pcard__link svg { width: 15px; height: 15px; transition: transform 0.3s var(--ease-out); }
+  .pcard__link:hover svg { transform: translate(2px, -2px); }
+  .pcard__link.is-primary { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+  .pcard__link:hover { background: var(--paper); color: var(--asphalt); box-shadow: none; }
+
+  .projects__more {
+    flex: none; width: clamp(240px, 20vw, 300px); aspect-ratio: 3 / 4;
+    display: grid; align-content: end; gap: 10px; padding: 26px;
+    background: transparent; color: var(--asphalt);
+    box-shadow: inset 0 0 0 3px var(--asphalt);
+    clip-path: var(--chamfer); --cut: 26px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .projects__more :global(svg) { width: 44px; height: 44px; margin-bottom: auto; }
+  .projects__more .display { font-size: 1.8rem; line-height: 1; }
+  .projects__more-sub { font-weight: 500; font-size: var(--t-sm); }
+  .projects__more:hover { background: var(--asphalt); color: var(--volt); }
+
+  .projects__progress { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 34px; height: 4px; background: rgb(16 16 19 / 0.15); }
+  .projects__progress i { display: block; height: 100%; background: var(--asphalt); transform-origin: left; transform: scaleX(0); }
+
+  @media (max-width: 900px) {
+    .projects__pin { min-height: 0; }
+    .projects__track { flex-direction: column; align-items: stretch; width: auto; padding-top: 100px; }
+    .projects__intro, .pcard, .projects__more { width: 100%; }
+    .projects__more { aspect-ratio: auto; min-height: 200px; }
+    .projects__progress, .projects__hint { display: none; }
+  }
+</style>

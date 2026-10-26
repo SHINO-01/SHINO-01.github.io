@@ -1,0 +1,39 @@
+---
+/** A diagonal caution-tape band with a looping marquee. */
+interface Props { items: string[]; tone?: 'volt' | 'ether' | 'dark' | 'hazard'; angle?: number; reverse?: boolean; class?: string }
+const { items, tone = 'volt', angle = -3, reverse = false, class: cls } = Astro.props;
+const run = [...items, ...items, ...items];
+---
+<div class:list={['tape', `tape--${tone}`, cls]} style={`--angle:${angle}deg`} data-tape data-dir={reverse ? -1 : 1} aria-hidden="true">
+  <div class="tape__track" data-tape-track>
+    {[0, 1].map(() => (
+      <div class="tape__run">
+        {run.map((t) => <span class="tape__item">{t}<svg viewBox="0 0 10 10"><path d="M5 0 10 5 5 10 0 5Z" /></svg></span>)}
+      </div>
+    ))}
+  </div>
+</div>
+<style>
+  .tape {
+    --bg: var(--volt); --fg: var(--asphalt);
+    position: relative;
+    width: 110%; margin-left: -5%;
+    rotate: var(--angle);
+    background: var(--bg); color: var(--fg);
+    overflow: hidden;
+    padding: 10px 0;
+    border-block: 3px solid var(--fg);
+    box-shadow: 0 0 0 3px var(--bg);
+    z-index: 3;
+  }
+  .tape--ether { --bg: var(--ether); --fg: var(--paper); }
+  .tape--dark { --bg: var(--asphalt); --fg: var(--volt); }
+  .tape--hazard { --bg: var(--hazard); --fg: var(--asphalt); }
+  .tape__track { display: flex; width: max-content; will-change: transform; }
+  .tape__run { display: flex; flex: none; }
+  .tape__item {
+    display: inline-flex; align-items: center; gap: 22px; padding-right: 22px;
+    font-family: var(--f-display); font-size: clamp(1rem, 1.6vw, 1.35rem); text-transform: uppercase; white-space: nowrap; line-height: 1.1;
+  }
+  .tape__item svg { width: 12px; height: 12px; fill: currentColor; }
+</style>

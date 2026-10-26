@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────────────────────────
+#  MISSION LOG — work history. Newest first; the site keeps your order.
+#  Dates are YYYY-MM. Use `end: present` for a current role.
+#  To add a job, copy one block (from `- role:` down) and edit it.
+# ─────────────────────────────────────────────────────────────
+
+- role: Junior AI Engineer
+  company: SForger
+  location: Poland · Remote
+  start: 2025-05
+  end: 2026-03
+  highlights:
+    - Re-architected a legacy monolith into decoupled, Dockerized TypeScript microservices, so AI chatbots could plug in through REST APIs.
+    - Engineered a multi-agent system with CrewAI and Python that gave enterprise clients autonomous integration tooling to consolidate their business operations.
+  stack: [TypeScript, Docker, Python, CrewAI]
+
+- role: Junior Software Engineer
+  company: W3 Engineers Ltd
+  location: Bangladesh
+  start: 2025-02
+  end: 2025-05
+  highlights:
+    - Built and deployed a business intelligence module with Python, React and PostgreSQL, using LangGraph to speed up ad operations for the sales team.
+    - Developed an internal documentation platform on RAG and vector databases that reads company codebases directly, cutting onboarding time and documentation overhead.
+  stack: [Python, React, PostgreSQL, LangGraph]
+
+- role: Software Engineering Intern
+  company: W3 Engineers Ltd
+  location: Bangladesh
+  start: 2024-11
+  end: 2025-02
+  highlights:
+    - Shipped live production features in Django with senior engineering leadership, refining architecture through peer code review.
+    - Built an itinerary-generation service in FastAPI that turns manual property listing forms into ready-to-publish travel content.
+    - Designed a Django and PostgreSQL dashboard that aggregates Google and Meta ad metrics for the marketing team.
+  stack: [Django, FastAPI, PostgreSQL, Python]

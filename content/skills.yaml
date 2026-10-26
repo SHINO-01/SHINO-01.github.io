@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────
+#  LOADOUT — skills.
+#  `attributes` draws the hexagon radar chart (use 3–8 entries, values 0–100).
+#  `loadout` is the grouped equipment grid. Tool names that match a
+#  Simple Icons title (https://simpleicons.org) get their logo automatically.
+# ─────────────────────────────────────────────────────────────
+
+attributes:
+  - name: AI agents & LLM systems
+    short: Agents
+    value: 92
+  - name: Backend & distributed systems
+    short: Backend
+    value: 88
+  - name: Infrastructure & DevOps
+    short: Infra
+    value: 80
+  - name: Data & databases
+    short: Data
+    value: 82
+  - name: Frontend & product UI
+    short: Frontend
+    value: 74
+  - name: Computer vision & research
+    short: Research
+    value: 78
+
+loadout:
+  - slot: Languages
+    items: [Python, Go, TypeScript, C++]
+  - slot: AI & agents
+    items: [CrewAI, LangGraph, LangChain, TensorFlow, OpenTelemetry]
+  - slot: Backend & data
+    items: [PostgreSQL, Redis, RabbitMQ, SQLite, FastAPI, Django, Express]
+  - slot: Frontend
+    items: [React, htmx, Alpine.js, Templ, Tailwind CSS]
+  - slot: Infrastructure
+    items: [Docker, AWS KMS, Node.js, Vercel]

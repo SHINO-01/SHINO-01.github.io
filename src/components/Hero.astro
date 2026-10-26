@@ -1,0 +1,240 @@
+---
+import { asset } from '../lib/data';
+import Tape from './Tape.astro';
+import Icon from './Icon.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { profile: CollectionEntry<'profile'>['data'] }
+const { profile: p } = Astro.props;
+const longest = Math.max(...p.nameLines.map((l) => l.length));
+---
+<section class="hero" id="agent" aria-labelledby="hero-name" data-hero>
+  <canvas class="hero__dots" data-halftone aria-hidden="true"></canvas>
+  <div class="hero__ghost display" aria-hidden="true" data-hero-ghost>{p.codename}</div>
+
+  <div class="hero__stage" data-hero-stage aria-hidden="true">
+    <div class="hero__slab" data-hero-slab>
+      <div class="hero__slab-dots halftone"></div>
+      <span class="hero__slab-code">{p.codename} / AGENT FILE / {p.rank}-RANK</span>
+    </div>
+    <div class="hero__tri" data-hero-tri></div>
+    <span class="hero__jp" data-hero-jp>{p.codenameJp}</span>
+
+    <div class="hero__portrait" data-hero-portrait>
+      <img class="hero__img hero__img--ink" src={asset(p.portrait.ink)} alt="" width="1400" height="1239" data-hero-ink />
+      <img class="hero__img hero__img--main" src={asset(p.portrait.main)} alt="" width="1400" height="1239" fetchpriority="high" data-hero-main />
+      <div class="hero__slices" data-hero-slices>
+        {Array.from({ length: 6 }).map(() => <div style={`background-image:url(${asset(p.portrait.main)})`}></div>)}
+      </div>
+    </div>
+
+    <!-- stickers -->
+    <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
+      <path d="M10 8h100a6 6 0 0 1 6 6v48a6 6 0 0 1-6 6H52L30 90l4-22H10a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
+      <text x="60" y="52" text-anchor="middle" font-family="Dela Gothic One" font-size="30" fill="var(--asphalt)">hi!</text>
+    </svg>
+    <svg class="sticker sticker--burst" viewBox="0 0 120 120" data-sticker>
+      <path d="M60 4l10 22 22-12-2 25 25 3-17 18 17 18-25 3 2 25-22-12-10 22-10-22-22 12 2-25-25-3 17-18L4 42l25-3-2-25 22 12Z" fill="var(--hazard)" stroke="var(--asphalt)" stroke-width="5" stroke-linejoin="round" />
+      <text x="60" y="70" text-anchor="middle" font-family="Dela Gothic One" font-size="26" fill="var(--asphalt)">AI</text>
+    </svg>
+    <svg class="sticker sticker--code" viewBox="0 0 150 54" data-sticker>
+      <rect x="3" y="3" width="144" height="48" fill="var(--paper)" stroke="var(--asphalt)" stroke-width="4" />
+      <g fill="var(--asphalt)">
+        {[0,3,5,9,11,12,16,19,21,24,27,28,31,34,36,38].map((x, i) => <rect x={12 + x * 2.6} y="11" width={i % 3 === 0 ? 3.4 : 1.8} height="24" />)}
+      </g>
+      <text x="12" y="45" font-family="Chakra Petch" font-weight="700" font-size="8" fill="var(--asphalt)">SHN-0001 // CLEARANCE {p.rank}</text>
+      <rect x="112" y="11" width="26" height="24" fill="var(--volt)" stroke="var(--asphalt)" stroke-width="3" />
+    </svg>
+  </div>
+
+  <div class="hero__copy">
+    <p class="hero__file" data-hero-in>
+      <span class="hero__file-tag">Agent file</span>
+      <span>{p.title}</span>
+    </p>
+    <h1 class="hero__name display" id="hero-name" aria-label={p.name} style={`--len:${longest}`}>
+      {p.nameLines.map((line) => <span class="hero__line" aria-hidden="true"><span class="hero__line-inner" data-hero-line>{line}</span></span>)}
+    </h1>
+    <div class="hero__roles" data-hero-in>
+      <span class="hero__roles-label">Role</span>
+      <span class="hero__role" data-role-rotator data-roles={JSON.stringify(p.roles)}>{p.roles[0]}</span>
+    </div>
+    <p class="hero__tagline" data-hero-in>{p.tagline}</p>
+    <div class="hero__ctas" data-hero-in>
+      <a class="btn" href="#projects" data-magnetic>
+        <span>See projects</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+      </a>
+      <a class="btn btn--ghost" href="#contact" data-magnetic><span>Get in touch</span></a>
+    </div>
+  </div>
+
+  <aside class="card" aria-label="Agent summary" data-hero-card>
+    <div class="card__rank">
+      <svg viewBox="0 0 60 68" aria-hidden="true"><path d="M30 2 58 18v32L30 66 2 50V18Z" fill="var(--volt)" stroke="var(--asphalt)" stroke-width="3" /></svg>
+      <span class="display">{p.rank}</span>
+    </div>
+    <dl class="card__stats">
+      <div><dt>Attribute</dt><dd>{p.attribute}</dd></div>
+      <div><dt>Faction</dt><dd>{p.faction}</dd></div>
+      <div><dt>Base</dt><dd>{p.location}</dd></div>
+    </dl>
+    {p.availability.open && (
+      <p class="card__status"><i aria-hidden="true"></i>{p.availability.label}</p>
+    )}
+    <div class="card__socials">
+      {p.socials.map((s) => (
+        <a href={s.url} target="_blank" rel="noopener" aria-label={s.label} data-magnetic><Icon name={s.icon} /></a>
+      ))}
+    </div>
+  </aside>
+
+  <div class="hero__scroll" aria-hidden="true"><span>Scroll</span><i></i></div>
+
+  <div class="hero__tapes" aria-hidden="true">
+    <Tape items={[p.availability.open ? p.availability.label : p.title, p.location, p.codename]} angle={-4} class="hero__tape-a" />
+    <Tape items={p.roles} tone="dark" angle={3} reverse class="hero__tape-b" />
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(100svh, 760px);
+    overflow: clip;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    align-items: center;
+    padding: 110px var(--gutter) 150px;
+    isolation: isolate;
+  }
+  .hero__dots { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -3; }
+  .hero__ghost {
+    position: absolute; left: -0.04em; bottom: 0.4em; z-index: -2;
+    font-size: clamp(8rem, 30vw, 30rem); line-height: 0.8;
+    color: transparent; -webkit-text-stroke: 2px rgb(241 240 234 / 0.045);
+    white-space: nowrap; pointer-events: none;
+  }
+
+  /* ── stage (art side) ── */
+  .hero__stage { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .hero__slab {
+    position: absolute; top: -10%; bottom: -10%; right: -6%; width: 50%;
+    background: var(--volt); color: var(--asphalt);
+    transform: skewX(-12deg);
+    transform-origin: bottom;
+    overflow: hidden;
+  }
+  .hero__slab-dots { position: absolute; inset: 0; opacity: 0.18; -webkit-mask-image: linear-gradient(200deg, #000 10%, transparent 65%); mask-image: linear-gradient(200deg, #000 10%, transparent 65%); }
+  .hero__jp {
+    position: absolute; top: 92px; right: 72px;
+    font-family: var(--f-display); font-size: clamp(5rem, 10.5vw, 11rem); line-height: 1;
+    writing-mode: vertical-rl;
+    color: transparent; -webkit-text-stroke: 3px var(--asphalt);
+    white-space: nowrap; opacity: 0.85;
+  }
+  .hero__slab-code {
+    position: absolute; left: 12%; bottom: 16%;
+    font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.3em;
+    writing-mode: vertical-rl; transform: skewX(12deg) rotate(180deg);
+  }
+  .hero__tri {
+    position: absolute; right: 0; bottom: 0; width: clamp(160px, 22vw, 380px); aspect-ratio: 1;
+    background: var(--ether); clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+  .hero__portrait {
+    position: absolute; right: 6%; bottom: 0;
+    width: min(60vw, 112vh, 1000px);
+    aspect-ratio: 1400 / 1239;
+    will-change: transform;
+  }
+  .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
+  .hero__img--main { filter: drop-shadow(18px 14px 0 rgb(16 16 19 / 0.9)); }
+  .hero__img--ink { opacity: 0; mix-blend-mode: normal; }
+  .hero__slices { position: absolute; inset: 0; pointer-events: none; }
+  .hero__slices div {
+    position: absolute; inset: 0;
+    background-size: contain; background-position: bottom; background-repeat: no-repeat;
+    opacity: 0;
+  }
+
+  .sticker { position: absolute; filter: drop-shadow(5px 6px 0 rgb(16 16 19 / 0.85)); }
+  .sticker--bubble { width: clamp(70px, 8vw, 120px); right: 41%; top: 22%; rotate: -10deg; }
+  .sticker--burst { width: clamp(70px, 7.5vw, 112px); right: 25%; top: 13%; rotate: 12deg; }
+  .sticker--code { width: clamp(110px, 11vw, 160px); right: 32%; bottom: 25%; rotate: -6deg; }
+
+  /* ── copy ── */
+  .hero__copy { position: relative; z-index: 2; max-width: 820px; container-type: inline-size; }
+  .hero__file { display: flex; align-items: center; gap: 12px; font-size: var(--t-sm); font-weight: 600; margin-bottom: 20px; }
+  .hero__file-tag {
+    background: var(--volt); color: var(--asphalt); padding: 4px 12px 4px 10px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; font-size: var(--t-xs);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  }
+  /* auto-fit: the longest line of the name fills the column (Dela Gothic caps ≈ 0.93em per glyph) */
+  .hero__name { font-size: min(calc(105cqi / (var(--len) * 0.93)), 10rem, 15svh); line-height: 0.86; letter-spacing: -0.02em; }
+  .hero__line { display: block; overflow: hidden; padding-bottom: 0.04em; }
+  .hero__line-inner { display: inline-block; text-shadow: 0.05em 0.05em 0 var(--asphalt); }
+  .hero__line:last-child:not(:first-child) .hero__line-inner { color: transparent; -webkit-text-stroke: 2px var(--paper); text-shadow: none; }
+  .hero__roles { display: flex; align-items: center; gap: 14px; margin-top: 26px; }
+  .hero__roles-label { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--smoke); }
+  .hero__role {
+    font-family: var(--f-display); font-size: var(--t-xl); color: var(--volt);
+    min-height: 1.2em;
+  }
+  .hero__tagline { margin-top: 18px; max-width: 46ch; font-size: var(--t-lg); line-height: 1.45; color: #c9c9c2; }
+  .hero__ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+
+  /* ── agent card ── */
+  .card {
+    position: absolute; right: clamp(56px, 6vw, 96px); bottom: 170px; z-index: 4;
+    width: 290px; padding: 20px 20px 18px;
+    background: rgb(16 16 19 / 0.88);
+    backdrop-filter: blur(8px);
+    clip-path: var(--chamfer); --cut: 18px;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .card__rank { position: absolute; right: 16px; top: 14px; width: 50px; display: grid; place-items: center; }
+  .card__rank svg { width: 100%; }
+  .card__rank span { position: absolute; font-size: 1.7rem; color: var(--asphalt); }
+  .card__stats { margin: 0; display: grid; gap: 10px; padding-right: 60px; }
+  .card__stats dt { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--smoke); }
+  .card__stats dd { margin: 0; font-weight: 600; line-height: 1.25; }
+  .card__status { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--steel); font-size: var(--t-sm); font-weight: 600; color: var(--volt); }
+  .card__status i { width: 9px; height: 9px; background: var(--volt); border-radius: 50%; box-shadow: 0 0 0 0 var(--volt); animation: ping 1.8s infinite; flex: none; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 9px rgb(215 255 31 / 0); } 100% { box-shadow: 0 0 0 0 rgb(215 255 31 / 0); } }
+  .card__socials { display: flex; gap: 8px; margin-top: 14px; }
+  .card__socials a { display: grid; place-items: center; width: 40px; height: 40px; background: var(--steel); transition: background-color 0.25s, color 0.25s; clip-path: var(--chamfer); --cut: 7px; }
+  .card__socials a:hover { background: var(--volt); color: var(--asphalt); }
+  .card__socials :global(svg) { width: 18px; height: 18px; }
+
+  .hero__scroll { position: absolute; left: var(--gutter); bottom: 128px; display: flex; align-items: center; gap: 12px; font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--smoke); }
+  .hero__scroll i { position: relative; width: 70px; height: 2px; background: var(--steel); overflow: hidden; }
+  .hero__scroll i::after { content: ''; position: absolute; inset: 0; background: var(--volt); animation: scrollcue 1.8s var(--ease-snap) infinite; }
+  @keyframes scrollcue { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
+
+  .hero__tapes { position: absolute; left: 0; right: 0; bottom: 20px; z-index: 5; height: 100px; }
+  .hero__tapes :global(.tape) { position: absolute; left: 0; }
+  .hero__tapes :global(.hero__tape-a) { bottom: 34px; }
+  .hero__tapes :global(.hero__tape-b) { bottom: 10px; }
+
+  @media (max-width: 1080px) {
+    .card { display: none; }
+    .hero__portrait { width: min(78vw, 90vh); right: -6%; }
+  }
+  @media (max-width: 760px) {
+    .hero { grid-template-columns: 1fr; align-items: end; padding-top: 52svh; padding-bottom: 150px; min-height: 100svh; }
+    .hero__slab { width: 92%; right: -30%; top: -5%; bottom: 30%; }
+    .hero__portrait { width: 118vw; right: -18vw; bottom: auto; top: 70px; }
+    .hero__tagline { font-size: var(--t-md); }
+    .hero__tri { width: 120px; }
+    .sticker--code, .hero__scroll { display: none; }
+    .sticker--bubble { right: auto; left: 6%; top: 20%; }
+    .sticker--burst { top: 12%; right: 4%; }
+    .hero__jp { top: 70px; right: 14px; font-size: 5rem; }
+    .hero__copy::before {
+      content: ''; position: absolute; inset: -40px -40px -20px; z-index: -1;
+      background: linear-gradient(to top, var(--asphalt) 70%, transparent);
+    }
+  }
+</style>

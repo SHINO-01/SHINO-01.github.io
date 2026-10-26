@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Tape from '../components/Tape.astro';
+import Loadout from '../components/Loadout.astro';
+import Missions from '../components/Missions.astro';
+import Projects from '../components/Projects.astro';
+import Records from '../components/Records.astro';
+import Contact from '../components/Contact.astro';
+import { loadSite } from '../lib/data';
+
+const { profile, skills, experience, projects, education, publications } = await loadSite();
+
+// Navigation order. Each id matches a section below.
+const sections = [
+  { id: 'agent', label: 'Agent' },
+  { id: 'loadout', label: 'Loadout' },
+  { id: 'missions', label: 'Missions' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'records', label: 'Records' },
+  { id: 'contact', label: 'Contact' },
+];
+const n = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0');
+const github = profile.socials.find((s) => s.icon.toLowerCase() === 'github')?.url;
+---
+<Layout title={`${profile.name} · ${profile.title}`} description={profile.tagline} codename={profile.codename}>
+  <Nav slot="chrome" codename={profile.codename} cv={profile.cv} sections={sections} />
+  <Hero profile={profile} />
+  <Loadout skills={skills} index={n('loadout')} />
+  <Missions experience={experience} index={n('missions')} />
+  <div class="divider" aria-hidden="true">
+    <Tape items={['Projects', 'Open source', 'Shipped to production']} tone="hazard" angle={-2.5} />
+  </div>
+  <Projects projects={projects} index={n('projects')} github={github} />
+  <Records education={education} publications={publications} index={n('records')} />
+  <Contact profile={profile} index={n('contact')} />
+</Layout>
+
+<style>
+  .divider { position: relative; z-index: 3; height: 0; }
+  .divider :global(.tape) { position: absolute; top: -28px; }
+</style>

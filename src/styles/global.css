@@ -1,0 +1,159 @@
+@import '@fontsource/dela-gothic-one/400.css';
+@import '@fontsource/chakra-petch/400.css';
+@import '@fontsource/chakra-petch/500.css';
+@import '@fontsource/chakra-petch/600.css';
+@import '@fontsource/chakra-petch/700.css';
+
+/* ───────────── Tokens ───────────── */
+:root {
+  --asphalt: #101013;
+  --panel: #1a1b20;
+  --steel: #2a2c34;
+  --smoke: #8b8d98;
+  --paper: #f1f0ea;
+  --concrete: #dfded6;
+  --volt: #d7ff1f;
+  --ether: #8f63ff;
+  --hazard: #ff5b1f;
+  --cyan: #3ce6ff;
+
+  --f-display: 'Dela Gothic One', 'Arial Black', system-ui, sans-serif;
+  --f-ui: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif;
+
+  /* modular scale, ratio 1.25 */
+  --t-xs: 0.8rem;
+  --t-sm: 0.9rem;
+  --t-md: 1.05rem;
+  --t-lg: 1.3rem;
+  --t-xl: 1.65rem;
+  --t-2xl: clamp(2rem, 4vw, 3rem);
+  --t-3xl: clamp(2.8rem, 7vw, 6rem);
+  --t-mega: clamp(3.4rem, 10.5vw, 10rem);
+
+  --gutter: clamp(16px, 4vw, 56px);
+  --ease-snap: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* chamfered corners — the signature shape of the UI */
+  --cut: 14px;
+  --chamfer: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+
+  color-scheme: dark;
+}
+
+/* ───────────── Base ───────────── */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-color: var(--volt) var(--asphalt);
+  scrollbar-width: thin;
+}
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  margin: 0;
+  background: var(--asphalt);
+  color: var(--paper);
+  font-family: var(--f-ui);
+  font-size: var(--t-md);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+main { overflow-x: clip; }
+
+h1, h2, h3, h4 { margin: 0; font-weight: 400; line-height: 0.95; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+::selection { background: var(--volt); color: var(--asphalt); }
+
+:focus-visible {
+  outline: 3px solid var(--volt);
+  outline-offset: 3px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: fixed; left: 16px; top: -60px; z-index: 1000;
+  background: var(--volt); color: var(--asphalt); padding: 10px 16px; font-weight: 700;
+}
+.skip-link:focus { top: 16px; }
+
+.display { font-family: var(--f-display); letter-spacing: -0.01em; text-transform: uppercase; }
+
+/* ───────────── Shared UI atoms ───────────── */
+.btn {
+  --bg: var(--volt);
+  --fg: var(--asphalt);
+  position: relative;
+  display: inline-flex; align-items: center; gap: 0.6em;
+  padding: 0.85em 1.5em 0.85em 1.3em;
+  background: var(--bg); color: var(--fg);
+  font-weight: 700; font-size: var(--t-sm); letter-spacing: 0.04em; text-transform: uppercase;
+  clip-path: var(--chamfer);
+  --cut: 10px;
+  transition: scale 0.25s var(--ease-out), background-color 0.2s, color 0.2s;
+  isolation: isolate;
+  overflow: hidden;
+}
+.btn::after {
+  /* sweep highlight on hover */
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: var(--paper);
+  transform: translateX(-101%) skewX(-20deg);
+  transition: transform 0.45s var(--ease-snap);
+}
+.btn:hover::after { transform: translateX(0) skewX(0); }
+.btn:active { scale: 0.97; }
+.btn svg { width: 1.1em; height: 1.1em; flex: none; }
+.btn--ghost { --bg: transparent; --fg: var(--paper); box-shadow: inset 0 0 0 2px var(--paper); clip-path: none; }
+.btn--ghost:hover { --fg: var(--asphalt); }
+.btn--dark { --bg: var(--asphalt); --fg: var(--paper); }
+.btn--dark::after { background: var(--ether); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 0.45em;
+  padding: 0.3em 0.7em;
+  font-size: var(--t-xs); font-weight: 600; letter-spacing: 0.03em;
+  background: var(--steel); color: var(--paper);
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+.chip svg { width: 13px; height: 13px; }
+
+.tag {
+  display: inline-block;
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+/* halftone dot field, reusable */
+.halftone {
+  background-image: radial-gradient(circle at center, currentColor 1.3px, transparent 1.6px);
+  background-size: 9px 9px;
+}
+
+/* caution-tape stripes */
+.stripes {
+  background: repeating-linear-gradient(-45deg, var(--asphalt) 0 14px, var(--volt) 14px 28px);
+}
+
+/* JS-driven initial states only apply when motion is enabled, so content is never hidden without JS. */
+.motion [data-reveal] { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────
+#  PROJECTS — shown as collectible cards in a horizontal scroller.
+#  Order here = order on the site.
+#
+#  rank:   S | A | B          (card rarity frame)
+#  color:  volt | ether | hazard | cyan   (card accent)
+#  glyph:  1–3 characters printed huge on the card art
+#  year:   optional, shown on the card
+#  image:  optional screenshot in /public (e.g. projects/tellproof.webp);
+#          without one, the card generates its own artwork.
+# ─────────────────────────────────────────────────────────────
+
+- name: Tellproof
+  tagline: Open-source AI telemetry & governance framework
+  rank: S
+  color: volt
+  glyph: TP
+  highlights:
+    - Tamper-evident Go agent batches LLM operations hourly under salted Merkle-tree commitments and Ed25519 signatures.
+    - Python and Node.js SDKs instrument major AI providers through OpenTelemetry and drop sensitive message content at parse time.
+    - PostgreSQL control plane with row-level security issues DSSE-enveloped compliance packs signed through AWS KMS.
+  stack: [Go, Python, Node.js, OpenTelemetry, PostgreSQL, AWS KMS]
+  links:
+    - label: GitHub
+      url: https://github.com/Lumetrix-Advanced-Technologies/tellproof
+    - label: npm
+      url: https://www.npmjs.com/package/tellproof
+    - label: PyPI
+      url: https://pypi.org/project/tellproof
+
+- name: Rolestash
+  tagline: Local-first Chrome extension & job tracker
+  rank: S
+  color: ether
+  glyph: RS
+  highlights:
+    - Shipped a monetised, local-first Kanban app to the Chrome Web Store with cross-device sync and payments.
+    - DOM-parsing extracts job metadata from diverse career portals and auto-fills application forms.
+    - Parses forwarded application emails to move cards between stages automatically.
+  stack: [Google Chrome, Kanban, Payments, Email parsing]
+  links:
+    - label: Website
+      url: https://rolestash.com
+    - label: GitHub
+      url: https://github.com/SHINO-01/rolestash-extension
+
+- name: NetZero Hub
+  tagline: Microservice architecture for carbon tracking
+  rank: A
+  color: hazard
+  glyph: NZ
+  highlights:
+    - API gateway plus five independently deployable services for EV charging, journey planning and carbon offsets, each with its own SQLite store.
+    - RabbitMQ with publisher confirms, an outbox and idempotent consumers keeps charging sessions completing through billing or broker outages.
+    - Mined 4,081 events from 371 cases against the BPMN designs, reaching 0.94–1.00 fitness and flagging 23 deviant cases.
+  stack: [TypeScript, Express, Docker, RabbitMQ, SQLite]
+  links:
+    - label: Live app
+      url: https://netzero-zeta.vercel.app
+    - label: GitHub
+      url: https://github.com/SHINO-01/netZero

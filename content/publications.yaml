@@ -1,0 +1,15 @@
+# ─────────────────────────────────────────────────────────────
+#  ACHIEVEMENTS — publications, awards, talks.
+#  `metric` is the big animated ring on the card (value 0–100, optional).
+# ─────────────────────────────────────────────────────────────
+
+- title: Comparative Study of Region-Based Approaches to Road Image Classification of National Highways of Bangladesh Using Deep Learning Models
+  venue: 2024 IEEE International Conference on Artificial Intelligence in Engineering and Technology (IICAIET)
+  year: 2024
+  url: https://ieeexplore.ieee.org/document/10730626
+  metric:
+    value: 98
+    label: accuracy on curved & complex roads
+  highlights:
+    - Hybrid deep learning model that classifies segmented satellite road imagery using covered-area analysis.
+    - Preprocessing pipeline that segments high-resolution highway imagery and holds up in data-constrained settings.

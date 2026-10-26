@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────────────────────
+#  AGENT PROFILE — who you are. Shown in the hero, nav and footer.
+#  Edit freely; the build validates every field and tells you
+#  exactly what is wrong if something is missing.
+# ─────────────────────────────────────────────────────────────
+
+name: Sakif Hussain Shachcha
+# How your name is broken into lines in the hero. The type auto-sizes to the longest line.
+nameLines: [Sakif, Hussain, Shachcha]
+codename: SHINO
+# Decorative katakana shown behind the portrait (any short text works).
+codenameJp: シノ
+
+title: AI & Software Engineer
+# Rotating role chips under your name.
+roles: [AI Engineer, Software Engineer, Agent Systems Builder]
+
+tagline: >-
+  I build multi-agent systems, verifiable AI telemetry and the
+  microservices that keep them running in production.
+
+location: Wollongong, Australia
+# Shown as a live status light in the hero. Set `open: false` to switch it off.
+availability:
+  open: true
+  label: Open to AI & software engineering roles
+
+email: sakifhussain33@gmail.com
+spokenLanguages: [Bengali (native), English (C2)]
+
+# Files in /public. Replace the PDF to update your CV download.
+cv: cv/Sakif_Hussain_Resume.pdf
+portrait:
+  main: agent/agent-sticker.webp   # colour cut-out with sticker outline
+  ink: agent/agent-ink.webp        # same pose, ink treatment (used for glitch effects)
+  alt: Sakif Hussain Shachcha in a denim shirt and cap, looking to the left
+
+# Game-style agent card in the hero.
+rank: S
+attribute: Ether · AI systems
+faction: University of Wollongong
+
+# icon: any Simple Icons name (https://simpleicons.org) or "linkedin" / "mail".
+socials:
+  - label: GitHub
+    url: https://github.com/SHINO-01
+    icon: github
+  - label: LinkedIn
+    url: https://www.linkedin.com/in/sakif-hussain
+    icon: linkedin
+  - label: IEEE Xplore
+    url: https://ieeexplore.ieee.org/document/10730626
+    icon: ieee
