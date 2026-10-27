@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { getLenis } from './state';
+import { diamondShards } from './shards';
 
 const $ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document) => root.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, root: ParentNode = document) => [...root.querySelectorAll<T>(s)];
@@ -80,10 +81,10 @@ function heroScrollOut() {
     addEventListener('hero:ready', () => { heroScrollOut(); ScrollTrigger.refresh(); }, { once: true });
     return;
   }
-  const cuts = $$('[data-hero-cut] > div', h);
   const lines = $$('.hero__line > *', h);
-  // slice-cut exit: the portrait swaps to horizontal bands that slide apart in alternating
-  // directions, and each name line slides out its own way. Scrubbed, so it reverses on the way back.
+  const shards = diamondShards(h);
+  // diamond-shard exit: the portrait swaps to a lattice of rhombus shards that peel off and
+  // stream left; each name line slides out its own way. Scrubbed, so it reverses on the way back.
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: h, start: 'top top', end: 'bottom top', scrub: 0.6,
@@ -91,7 +92,7 @@ function heroScrollOut() {
     },
   });
   tl.to($('[data-hero-portrait]', h), { yPercent: 10, ease: 'none' }, 0)
-    .to(cuts, { x: (k: number) => (k % 2 ? 1 : -1) * (70 + k * 38), ease: 'power2.in' }, 0)
+    .to(shards.state, { p: 1, ease: 'none', onUpdate: shards.draw }, 0)
     .to(lines, { x: (k: number) => (k % 2 ? 1 : -1) * 280, ease: 'power2.in' }, 0)
     .to($('.hero__copy', h), { opacity: 0.35, ease: 'none' }, 0)
     .to($('[data-hero-slab]', h), { xPercent: 12, ease: 'none' }, 0)

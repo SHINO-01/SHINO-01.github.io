@@ -18,6 +18,8 @@ const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c
 ---
 <section class="records" id="records" aria-labelledby="records-title">
   <Dots tone="light" />
+  <!-- slowly morphing topographic contour lines across the whole background -->
+  <canvas class="records__topo" aria-hidden="true" data-topo></canvas>
   <div class="records__inner">
     <SectionHead id="records-title" index={index} title={copy.title} kicker={copy.kicker} tone="light" jp={copy.jp} />
 
@@ -94,6 +96,8 @@ const bars = (s: string) => Array.from(s.replace(/\s/g, '').slice(0, 26)).map((c
     background: var(--paper); color: var(--asphalt);
     padding: clamp(100px, 12vw, 160px) var(--gutter);
   }
+  .records__topo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; }
+  .records__topo.is-on { opacity: 1; }
   .records__inner { max-width: 1320px; margin: 0 auto; }
   .records__grid { display: grid; grid-template-columns: 7fr 5fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
   .records__col { display: grid; gap: 20px; }

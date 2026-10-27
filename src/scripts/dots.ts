@@ -22,7 +22,7 @@ const BASE_PERM = [...Array(256).keys()].sort((a, b) => ((a * 7919 + 13) % 256) 
 const PERM = Uint8Array.from({ length: 512 }, (_, i) => BASE_PERM[i & 255]);
 const hash = (x: number, y: number) => PERM[(PERM[x & 255] + y) & 511] / 255;
 const smooth = (t: number) => t * t * (3 - 2 * t);
-function noise(x: number, y: number) {
+export function noise(x: number, y: number) {
   const xi = Math.floor(x), yi = Math.floor(y);
   const xf = smooth(x - xi), yf = smooth(y - yi);
   const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);

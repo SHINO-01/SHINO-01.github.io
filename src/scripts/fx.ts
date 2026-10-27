@@ -5,6 +5,7 @@
  * Everything only runs while on screen.
  */
 import gsap from 'gsap';
+import { noise } from './dots';
 
 const onScreen = (el: Element, cb: (visible: boolean) => void) =>
   new IntersectionObserver(([e]) => cb(e.isIntersecting), { rootMargin: '80px' }).observe(el);
@@ -132,6 +133,101 @@ export function initWaves() {
     };
     onScreen(svg, (v) => {
       if (v && !visible) { size(); visible = true; requestAnimationFrame(tick); }
+      else if (!v) visible = false;
+    });
+    addEventListener('resize', () => visible && size());
+  });
+}
+
+/* ───────── topographic contours (Records) ───────── */
+/**
+ * Marching-squares contour lines over a drifting noise terrain. The cursor raises a soft hill
+ * the lines flow around. Coarse grid, ~24fps, only while the section is on screen.
+ */
+export function initTopo() {
+  document.querySelectorAll<HTMLCanvasElement>('[data-topo]').forEach((canvas) => {
+    const ctx = canvas.getContext('2d')!;
+    const host = canvas.parentElement!;
+    const LEVELS = Array.from({ length: 12 }, (_, i) => 0.2 + i * 0.052);
+    let w = 0, h = 0, cell = 26, cols = 0, rows = 0, visible = false, last = 0;
+    let field = new Float32Array(0);
+    const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+
+    const size = () => {
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      w = host.clientWidth; h = host.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cell = w < 700 ? 30 : 26;
+      cols = Math.ceil(w / cell) + 1; rows = Math.ceil(h / cell) + 1;
+      field = new Float32Array(cols * rows);
+    };
+    if (matchMedia('(pointer: fine)').matches) {
+      host.addEventListener('pointermove', (e) => {
+        const r = host.getBoundingClientRect();
+        mouse.tx = e.clientX - r.left; mouse.ty = e.clientY - r.top;
+      });
+      host.addEventListener('pointerleave', () => { mouse.tx = mouse.ty = -9999; });
+    }
+
+    const draw = (t: number) => {
+      const ts = t * 0.00004;
+      if (mouse.tx > -999) {
+        mouse.x = mouse.x < -999 ? mouse.tx : mouse.x + (mouse.tx - mouse.x) * 0.12;
+        mouse.y = mouse.y < -999 ? mouse.ty : mouse.y + (mouse.ty - mouse.y) * 0.12;
+      } else { mouse.x = mouse.y = -9999; }
+      // sample the terrain at grid corners
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          const x = i * cell, y = j * cell;
+          let v = noise(x * 0.0021 + ts * 9, y * 0.0021 - ts * 4) * 0.68 + noise(x * 0.0052 - ts * 6, y * 0.0052 + 3.7) * 0.32;
+          const dx = x - mouse.x, dy = y - mouse.y;
+          v += Math.exp(-(dx * dx + dy * dy) / (2 * 150 * 150)) * 0.22;
+          field[j * cols + i] = v;
+        }
+      }
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineWidth = 1.1;
+      LEVELS.forEach((lv, li) => {
+        const path = new Path2D();
+        for (let j = 0; j < rows - 1; j++) {
+          for (let i = 0; i < cols - 1; i++) {
+            const a = field[j * cols + i], b = field[j * cols + i + 1];
+            const c = field[(j + 1) * cols + i + 1], d = field[(j + 1) * cols + i];
+            const idx = (a > lv ? 8 : 0) | (b > lv ? 4 : 0) | (c > lv ? 2 : 0) | (d > lv ? 1 : 0);
+            if (idx === 0 || idx === 15) continue;
+            const x = i * cell, y = j * cell;
+            // interpolated crossing points on each edge
+            const top = () => [x + cell * ((lv - a) / (b - a)), y];
+            const right = () => [x + cell, y + cell * ((lv - b) / (c - b))];
+            const bottom = () => [x + cell * ((lv - d) / (c - d)), y + cell];
+            const left = () => [x, y + cell * ((lv - a) / (d - a))];
+            const seg = (p: number[], q: number[]) => { path.moveTo(p[0], p[1]); path.lineTo(q[0], q[1]); };
+            switch (idx) {
+              case 1: case 14: seg(left(), bottom()); break;
+              case 2: case 13: seg(bottom(), right()); break;
+              case 3: case 12: seg(left(), right()); break;
+              case 4: case 11: seg(top(), right()); break;
+              case 6: case 9: seg(top(), bottom()); break;
+              case 7: case 8: seg(left(), top()); break;
+              case 5: seg(left(), top()); seg(bottom(), right()); break;
+              case 10: seg(top(), right()); seg(left(), bottom()); break;
+            }
+          }
+        }
+        // every fourth line is an accent contour in violet
+        ctx.strokeStyle = li % 4 === 1 ? 'rgba(143,99,255,0.45)' : 'rgba(16,16,19,0.15)';
+        ctx.stroke(path);
+      });
+    };
+
+    const tick = (t: number) => {
+      if (!visible) return;
+      if (t - last > 41) { draw(t); last = t; }
+      requestAnimationFrame(tick);
+    };
+    onScreen(host, (v) => {
+      if (v && !visible) { size(); visible = true; canvas.classList.add('is-on'); requestAnimationFrame(tick); }
       else if (!v) visible = false;
     });
     addEventListener('resize', () => visible && size());

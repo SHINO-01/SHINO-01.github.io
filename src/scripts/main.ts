@@ -9,7 +9,7 @@ import { initScroll } from './scroll';
 import { initUI } from './ui';
 import { setLenis } from './state';
 import { initDots } from './dots';
-import { initSpeedLines, initWaves } from './fx';
+import { initSpeedLines, initWaves, initTopo } from './fx';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
@@ -49,6 +49,7 @@ if (!motion) {
     initDots();
     initSpeedLines();
     initWaves();
+    initTopo();
     initScroll(true);
     if (hash) {
       // pinned sections add height, so re-measure before jumping

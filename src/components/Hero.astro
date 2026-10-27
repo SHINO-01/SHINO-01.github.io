@@ -45,10 +45,8 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
       <div class="hero__slices" data-hero-slices>
         {Array.from({ length: 6 }).map(() => <div style={`background-image:${portraitUrl}`}></div>)}
       </div>
-      <!-- slice-cut exit: fixed horizontal bands that slide apart as you scroll away -->
-      <div class="hero__cut" data-hero-cut>
-        {Array.from({ length: 7 }).map((_, k) => <div style={`background-image:${portraitUrl};clip-path:inset(${(k * 100) / 7}% 0 ${100 - ((k + 1) * 100) / 7}% 0)`}></div>)}
-      </div>
+      <!-- diamond-shard exit: the portrait breaks into rhombus shards that stream left on scroll (scripts/scroll.ts) -->
+      <canvas class="hero__shards" data-hero-shards></canvas>
     </div>
 
   </div>
@@ -170,9 +168,8 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
   }
   .hero__echo--a { background: var(--volt); opacity: 0.9; }
   .hero__echo--b { background: var(--ether); opacity: 0.85; }
-  .hero__cut { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
-  .hero__cut div { position: absolute; inset: 0; background-size: contain; background-position: bottom; background-repeat: no-repeat; will-change: transform; }
-  .hero.is-cut .hero__cut { visibility: visible; }
+  .hero__shards { position: absolute; inset: 0; width: 100%; height: 100%; visibility: hidden; pointer-events: none; overflow: visible; }
+  .hero.is-cut .hero__shards { visibility: visible; }
   .hero.is-cut .hero__img, .hero.is-cut .hero__echo, .hero.is-cut .hero__slices { opacity: 0 !important; }
   .hero__slices { position: absolute; inset: 0; pointer-events: none; }
   .hero__slices div {
