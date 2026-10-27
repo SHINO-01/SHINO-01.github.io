@@ -119,20 +119,26 @@ function tapes() {
   const tracks = $$('[data-tape]').map((tape) => {
     const track = $('[data-tape-track]', tape)!;
     const dir = Number(tape.dataset.dir || 1);
-    return { track, dir, x: 0, visible: true, tape };
+    return { track, dir, x: 0, half: 0, visible: true, tape };
   });
+  // measure track widths once (and on resize) instead of reading layout every frame
+  const measure = () => tracks.forEach((t) => { t.half = t.track.scrollWidth / 2; });
+  measure();
+  addEventListener('resize', measure);
+  document.fonts?.ready.then(measure);
   tracks.forEach((t) => new IntersectionObserver(([e]) => { t.visible = e.isIntersecting; }).observe(t.tape));
   let skew = 0;
   gsap.ticker.add((_, dt) => {
     const v = getLenis()?.velocity ?? 0;
     skew += (gsap.utils.clamp(-8, 8, v * 0.4) - skew) * 0.1;
+    // snap to 0 when settled: a lingering tiny skew forces the text to re-rasterise every frame
+    if (Math.abs(skew) < 0.05) skew = 0;
     tracks.forEach((t) => {
-      if (!t.visible) return;
-      const half = t.track.scrollWidth / 2;
+      if (!t.visible || !t.half) return;
       t.x -= t.dir * (0.05 + Math.abs(v) * 0.02) * dt;
-      if (t.x <= -half) t.x += half;
-      if (t.x > 0) t.x -= half;
-      t.track.style.transform = `translate3d(${t.x}px,0,0) skewX(${-skew}deg)`;
+      if (t.x <= -t.half) t.x += t.half;
+      if (t.x > 0) t.x -= t.half;
+      t.track.style.transform = skew ? `translate3d(${t.x}px,0,0) skewX(${-skew}deg)` : `translate3d(${t.x}px,0,0)`;
     });
   });
 }

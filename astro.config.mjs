@@ -9,4 +9,6 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: { inlineStylesheets: 'auto' },
   devToolbar: { enabled: false },
+  // keep fonts as separate files (fetched only when a glyph needs them) rather than base64 in the CSS
+  vite: { build: { assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined) } },
 });

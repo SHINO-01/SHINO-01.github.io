@@ -45,13 +45,15 @@ function field(layer: HTMLElement) {
   const ctx = canvas.getContext('2d')!;
   const tone = TONES[(layer.dataset.dots as Tone) || 'dark'];
   const base = layer.dataset.dotsBase || 'faint';
+  const flow = base === 'flow';
   const host = layer.parentElement!;
-  let w = 0, h = 0, dpr = 1, running = false;
+  let w = 0, h = 0, dpr = 1, running = false, last = 0, lastKey = '';
+  let grid: CanvasPattern | null = null;
   // eased cursor position in canvas space, so the bloom trails the pointer slightly
   const p = { x: -9999, y: -9999 };
   // click shockwaves travelling through the dot sizes (flow mode only)
   const ripples: { x: number; y: number; t: number }[] = [];
-  if (base === 'flow') {
+  if (flow) {
     host.addEventListener('pointerdown', (e) => {
       const c = canvas.getBoundingClientRect();
       ripples.push({ x: e.clientX - c.left, y: e.clientY - c.top, t: performance.now() });
@@ -60,12 +62,26 @@ function field(layer: HTMLElement) {
   }
 
   const size = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2);
+    // resolution cap: the animated hero field is redrawn constantly, so it stays near 1x;
+    // GAP * dpr is kept a whole number so the tiled grid never drifts from the bloom dots
+    const raw = flow ? 1 : Math.min(devicePixelRatio || 1, 1.5);
+    dpr = Math.max(1, Math.round(GAP * raw) / GAP);
     w = canvas.clientWidth; h = canvas.clientHeight;
-    canvas.width = w * dpr; canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    // the static grid is one tiny tile repeated, instead of thousands of separate circles
+    grid = null;
+    if (!flow && base !== 'none' && tone.baseAlpha > 0) {
+      const t = document.createElement('canvas');
+      t.width = t.height = Math.round(GAP * dpr);
+      const tc = t.getContext('2d')!;
+      tc.fillStyle = `rgba(${tone.base},${tone.baseAlpha})`;
+      tc.beginPath(); tc.arc(t.width / 2, t.height / 2, 0.9 * dpr, 0, Math.PI * 2); tc.fill();
+      grid = ctx.createPattern(t, 'repeat');
+    }
+    lastKey = '';
   };
 
+  const BLOOM = 6;
   const draw = (t: number) => {
     const c = canvas.getBoundingClientRect();
     const hostTop = host.getBoundingClientRect().top;
@@ -73,14 +89,26 @@ function field(layer: HTMLElement) {
     const far = mouse.x < -999;
     p.x = far ? -9999 : p.x < -999 ? tx : p.x + (tx - p.x) * 0.14;
     p.y = far ? -9999 : p.y < -999 ? ty : p.y + (ty - p.y) * 0.14;
-
-    ctx.clearRect(0, 0, w, h);
     // grid rows are anchored to the section, not the canvas
     const offset = (((hostTop - c.top) % GAP) + GAP) % GAP;
-    const time = t * 0.0018;
-    const waveW = w * 0.62;
 
-    if (base === 'flow') {
+    // static fields only repaint when the cursor or the scroll position actually changed
+    if (!flow) {
+      const key = `${Math.round(p.x * 2)},${Math.round(p.y * 2)},${offset.toFixed(1)}`;
+      if (key === lastKey) return;
+      lastKey = key;
+    }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (grid) {
+      ctx.setTransform(1, 0, 0, 1, 0, Math.round(offset * dpr));
+      ctx.fillStyle = grid;
+      ctx.fillRect(0, -Math.round(offset * dpr), canvas.width, canvas.height);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (flow) {
       // ether currents: dot size follows a domain-warped noise field drifting over time,
       // tinted from grey toward violet where the current is strongest
       const now = performance.now();
@@ -116,41 +144,37 @@ function field(layer: HTMLElement) {
       });
       ctx.fillStyle = `rgba(${tone.hot},0.85)`;
       ctx.fill(ringPath);
-    } else if (base !== 'none' && tone.baseAlpha > 0) {
-      ctx.fillStyle = `rgba(${tone.base},${base === 'wave' ? 0.16 : tone.baseAlpha})`;
-      ctx.beginPath();
-      for (let y = offset + GAP / 2; y < h; y += GAP) {
-        for (let x = GAP / 2; x < (base === 'wave' ? waveW : w); x += GAP) {
-          let r = 0.9;
-          if (base === 'wave') {
-            const fade = 1 - x / waveW;
-            r = 0.6 + ((Math.sin(x * 0.012 + y * 0.008 - time) + 1) / 2) * 1.1 * fade;
-          }
-          ctx.moveTo(x + r, y);
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-        }
-      }
-      ctx.fill();
     }
 
-    // bloom around the cursor
+    // bloom around the cursor, batched into a few opacity levels instead of one fill per dot
     if (p.x > -REACH && p.x < w + REACH && p.y > -REACH && p.y < h + REACH) {
+      const levels = Array.from({ length: BLOOM }, () => new Path2D());
       const x0 = Math.max(GAP / 2, Math.floor((p.x - REACH) / GAP) * GAP + GAP / 2);
       const y0 = Math.floor((p.y - REACH - offset) / GAP) * GAP + offset + GAP / 2;
       for (let y = y0; y < p.y + REACH; y += GAP) {
         for (let x = x0; x < p.x + REACH; x += GAP) {
           const near = 1 - Math.hypot(x - p.x, y - p.y) / REACH;
           if (near <= 0.02) continue;
-          ctx.fillStyle = `rgba(${tone.hot},${0.25 + near * 0.75})`;
-          ctx.beginPath();
-          ctx.arc(x, y, 0.9 + near * 5, 0, Math.PI * 2);
-          ctx.fill();
+          const r = 0.9 + near * 5;
+          const lv = levels[Math.min(BLOOM - 1, Math.floor(near * BLOOM))];
+          lv.moveTo(x + r, y);
+          lv.arc(x, y, r, 0, Math.PI * 2);
         }
       }
+      levels.forEach((path, i) => {
+        ctx.fillStyle = `rgba(${tone.hot},${0.25 + ((i + 0.5) / BLOOM) * 0.75})`;
+        ctx.fill(path);
+      });
     }
   };
 
-  const tick = (t: number) => { if (running) { draw(t); requestAnimationFrame(tick); } };
+  const tick = (t: number) => {
+    if (!running) return;
+    // the flowing hero field is ambient, so 30fps is plenty; it also holds still while the
+    // hero is breaking apart on scroll-out (.is-cut), when the shards are the focus
+    if (!flow || (t - last > 32 && !host.classList.contains('is-cut'))) { draw(t); last = t; }
+    requestAnimationFrame(tick);
+  };
   new IntersectionObserver(([e]) => {
     if (e.isIntersecting && !running) {
       size();

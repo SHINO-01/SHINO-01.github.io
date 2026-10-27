@@ -33,9 +33,9 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
 
     <div class="hero__portrait" data-hero-portrait>
       <!-- afterimages (残像): flat silhouettes from the portrait's own mask -->
-      <div class="hero__echo hero__echo--b" style={`--src:${portraitUrl}`} data-hero-echo></div>
-      <div class="hero__echo hero__echo--a" style={`--src:${portraitUrl}`} data-hero-echo></div>
-      <img class="hero__img hero__img--ink" src={asset(p.portrait.ink)} alt="" width="1400" height="1239" data-hero-ink />
+      <canvas class="hero__echo hero__echo--b" data-hero-echo data-color="#8f63ff"></canvas>
+      <canvas class="hero__echo hero__echo--a" data-hero-echo data-color="#d7ff1f"></canvas>
+      <img class="hero__img hero__img--ink" data-src={asset(p.portrait.ink)} alt="" width="1400" height="1239" data-hero-ink />
       <img class="hero__img hero__img--main" src={asset(p.portrait.main)} alt="" width="1400" height="1239" fetchpriority="high" data-hero-main />
 
       <svg class="sticker sticker--bubble" viewBox="0 0 120 96" data-sticker>
@@ -136,12 +136,12 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
   /* diagonal band of halftone light that sweeps across the slab */
   .hero__scan {
     position: absolute; inset: -20% -60%;
-    background-image: radial-gradient(circle at center, rgb(255 255 255 / 0.75) 1.5px, transparent 2px);
+    background-image: radial-gradient(circle at center, rgb(255 255 255 / 0.5) 1.5px, transparent 2px);
     background-size: 8px 8px;
     -webkit-mask-image: linear-gradient(100deg, transparent 38%, #000 47%, #000 53%, transparent 62%);
     mask-image: linear-gradient(100deg, transparent 38%, #000 47%, #000 53%, transparent 62%);
     transform: translateX(-70%);
-    mix-blend-mode: overlay;
+    will-change: transform;
   }
   .hero__slab-code {
     position: absolute; left: 12%; bottom: 16%;
@@ -161,13 +161,10 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
   .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
   .hero__img--main { filter: drop-shadow(18px 14px 0 rgb(16 16 19 / 0.9)); }
   .hero__img--ink { opacity: 0; mix-blend-mode: normal; }
-  .hero__echo {
-    position: absolute; inset: 0; will-change: transform;
-    -webkit-mask: var(--src) bottom / contain no-repeat; mask: var(--src) bottom / contain no-repeat;
-    transform-origin: 50% 100%;
-  }
-  .hero__echo--a { background: var(--volt); opacity: 0.9; }
-  .hero__echo--b { background: var(--ether); opacity: 0.85; }
+  /* silhouettes are painted once onto canvases (scripts/hero.ts), so moving them costs nothing */
+  .hero__echo { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; transform-origin: 50% 100%; }
+  .hero__echo--a { opacity: 0.9; }
+  .hero__echo--b { opacity: 0.85; }
   .hero__shards { position: absolute; inset: 0; width: 100%; height: 100%; visibility: hidden; pointer-events: none; overflow: visible; }
   .hero.is-cut .hero__shards { visibility: visible; }
   .hero.is-cut .hero__img, .hero.is-cut .hero__echo, .hero.is-cut .hero__slices { opacity: 0 !important; }
@@ -182,7 +179,7 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
   .sticker--bubble { width: 12%; right: 59%; top: 9%; rotate: -8deg; z-index: 2; }
   
   /* ── copy ── */
-  .hero__copy { position: relative; z-index: 2; max-width: 820px; container-type: inline-size; }
+  .hero__copy { position: relative; z-index: 2; max-width: 820px; container-type: inline-size; will-change: opacity; } /* fades on scroll-out */
   .hero__file { display: flex; align-items: center; gap: 12px; font-size: var(--t-sm); font-weight: 600; margin-bottom: 20px; }
   .hero__file-tag {
     background: var(--volt); color: var(--asphalt); padding: 4px 12px 4px 10px;
@@ -203,6 +200,7 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
     -webkit-background-clip: text; background-clip: text;
     animation: name-sweep 5.5s 3s var(--ease-snap) infinite;
   }
+  .hero.is-cut .hero__line-inner::after { animation-play-state: paused; }
   @keyframes name-sweep { 0% { background-position: 160% 0; } 30%, 100% { background-position: -60% 0; } }
   .hero__line--draw { overflow: visible; }
   .hero__draw { display: block; width: 100%; height: 0.92em; overflow: visible; }
@@ -220,8 +218,7 @@ const portraitUrl = `url(${asset(p.portrait.main)})`;
   .card {
     position: absolute; right: clamp(56px, 6vw, 96px); bottom: 170px; z-index: 4;
     width: 330px; padding: 24px 24px 22px;
-    background: rgb(16 16 19 / 0.88);
-    backdrop-filter: blur(8px);
+    background: rgb(16 16 19 / 0.94);
     clip-path: var(--chamfer); --cut: 18px;
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
   }

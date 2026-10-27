@@ -1,6 +1,12 @@
 ---
 import '../styles/global.css';
 import { asset } from '../lib/data';
+import fontDela from '@fontsource/dela-gothic-one/files/dela-gothic-one-latin-400-normal.woff2?url';
+import fontUi from '@fontsource/chakra-petch/files/chakra-petch-latin-400-normal.woff2?url';
+import fontUiBold from '@fontsource/chakra-petch/files/chakra-petch-latin-700-normal.woff2?url';
+// all Dela Gothic subsets (incl. ~120 small Japanese slices, each fetched only if a glyph needs it),
+// loaded without blocking first paint
+import fontDelaAll from '@fontsource/dela-gothic-one/400.css?url';
 
 interface Props {
   title: string;
@@ -22,6 +28,11 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
     <meta name="description" content={description} />
     <meta name="theme-color" content="#101013" />
     <link rel="canonical" href={canonical} />
+    <!-- the boot screen waits for fonts, so fetch the core faces immediately -->
+    <link rel="preload" href={fontDela} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontUi} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontUiBold} as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href={fontDelaAll} media="print" onload="this.media='all'" />
     <link rel="icon" type="image/svg+xml" href={asset('favicon.svg')} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -128,14 +139,16 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
   /* ───────────── Cursor ───────────── */
   .cursor { display: none; }
   @media (hover: hover) and (pointer: fine) {
-    .motion .cursor { display: block; position: fixed; inset: 0; pointer-events: none; z-index: 950; mix-blend-mode: difference; }
+    .motion .cursor { display: block; position: fixed; inset: 0; pointer-events: none; z-index: 950; }
     .motion, .motion a, .motion button { cursor: none; }
   }
   .cursor__dot, .cursor__ring { position: fixed; left: 0; top: 0; will-change: transform; }
-  .cursor__dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--paper); }
+  /* paper with an ink outline reads on dark, light and lime sections without a blend mode */
+  .cursor__dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--paper); box-shadow: 0 0 0 1.5px var(--asphalt); }
   .cursor__ring {
     width: 36px; height: 36px; margin: -18px 0 0 -18px;
     transition: scale 0.3s var(--ease-out), rotate 0.4s var(--ease-out);
+    filter: drop-shadow(0 0 1px var(--asphalt)) drop-shadow(0 0 1px var(--asphalt));
   }
   .cursor__ring i { position: absolute; width: 9px; height: 9px; border-color: var(--paper); border-style: solid; border-width: 0; }
   .cursor__ring i:nth-child(1) { left: 0; top: 0; border-left-width: 2px; border-top-width: 2px; }
@@ -147,8 +160,8 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
 
   .burst {
     position: fixed; z-index: 951; width: 70px; height: 70px; margin: -35px 0 0 -35px;
-    pointer-events: none; overflow: visible; mix-blend-mode: difference;
-    fill: none; stroke: var(--paper); stroke-width: 2.5;
+    pointer-events: none; overflow: visible;
+    fill: none; stroke: var(--ether); stroke-width: 2.5;
   }
 
   .toast {
@@ -166,14 +179,7 @@ const ogImage = new URL(asset('og.jpg'), Astro.site).href;
   .progress { position: fixed; left: 0; right: 0; top: 0; height: 3px; z-index: 120; pointer-events: none; }
   .progress i { display: block; height: 100%; background: var(--ether); transform-origin: left; transform: scaleX(0); }
   .grain {
-    position: fixed; inset: -50%; z-index: 800; pointer-events: none; opacity: 0.07;
+    position: fixed; inset: 0; z-index: 800; pointer-events: none; opacity: 0.07;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .motion .grain { animation: grain 0.6s steps(4) infinite; }
-  @keyframes grain {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-3%, 2%); }
-    50% { transform: translate(2%, -3%); }
-    75% { transform: translate(-1%, 3%); }
   }
 </style>

@@ -1,4 +1,7 @@
-@import '@fontsource/dela-gothic-one/400.css';
+/* Latin only here (render-blocking). The Japanese subsets load in the background from
+   layouts/Layout.astro, so this stylesheet doesn't carry ~120 font declarations up front. */
+@import '@fontsource/dela-gothic-one/latin-400.css';
+@import '@fontsource/dela-gothic-one/latin-ext-400.css';
 @import '@fontsource/chakra-petch/400.css';
 @import '@fontsource/chakra-petch/500.css';
 @import '@fontsource/chakra-petch/600.css';

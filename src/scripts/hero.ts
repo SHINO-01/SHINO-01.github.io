@@ -7,6 +7,34 @@ const $$ = <T extends Element = HTMLElement>(s: string, root: ParentNode = docum
 const hero = () => $('[data-hero]');
 let heroChars: HTMLElement[] = [];
 
+/**
+ * Paint the afterimage silhouettes once from the portrait's alpha channel. A canvas texture
+ * can be moved and stretched on the GPU for free; a CSS mask is re-rasterised every frame.
+ */
+function paintEchoes(h: HTMLElement) {
+  const img = $<HTMLImageElement>('[data-hero-main]', h);
+  const canvases = $$<HTMLCanvasElement>('[data-hero-echo]', h);
+  if (!img || !canvases.length) return;
+  const paint = () => {
+    canvases.forEach((c) => {
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      const w = c.clientWidth, ht = c.clientHeight;
+      if (!w || !ht || !img.naturalWidth) return;
+      c.width = Math.round(w * dpr); c.height = Math.round(ht * dpr);
+      const ctx = c.getContext('2d')!;
+      const scale = Math.min(c.width / img.naturalWidth, c.height / img.naturalHeight);
+      const iw = img.naturalWidth * scale, ih = img.naturalHeight * scale;
+      ctx.drawImage(img, (c.width - iw) / 2, c.height - ih, iw, ih); // object-fit: contain, bottom
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = c.dataset.color || '#d7ff1f';
+      ctx.fillRect(0, 0, c.width, c.height);
+    });
+  };
+  (img.complete ? Promise.resolve() : img.decode().catch(() => {})).then(paint);
+  let t = 0;
+  addEventListener('resize', () => { clearTimeout(t); t = window.setTimeout(paint, 150); });
+}
+
 /** Hide hero parts before the loader clears so nothing flashes. */
 export function heroInitialState() {
   const h = hero();
@@ -15,12 +43,13 @@ export function heroInitialState() {
   gsap.set($('[data-hero-tri]', h), { scale: 0, transformOrigin: '100% 100%' });
   gsap.set($$('[data-draw]', h), { strokeDasharray: 900, strokeDashoffset: 900 });
   gsap.set($('[data-hero-main]', h), { xPercent: 30, opacity: 0, filter: 'blur(14px)' });
+  paintEchoes(h);
   const [echoB, echoA] = $$('[data-hero-echo]', h);
   gsap.set(echoB, { xPercent: 85, opacity: 0, scaleX: 1.7 });
   gsap.set(echoA, { xPercent: 65, opacity: 0, scaleX: 1.45 });
   // split solid name lines into letters for the smear-in
   heroChars = $$('[data-hero-line]', h).flatMap((line) => SplitText.create(line, { type: 'chars', charsClass: 'char' }).chars as HTMLElement[]);
-  gsap.set(heroChars, { xPercent: -170, scaleX: 2.6, opacity: 0, filter: 'blur(8px)', transformOrigin: '100% 50%' });
+  gsap.set(heroChars, { xPercent: -170, scaleX: 2.6, opacity: 0, transformOrigin: '100% 50%' });
   gsap.set($$('[data-hero-in]', h), { y: 28, opacity: 0 });
   gsap.set($('[data-hero-card]', h), { xPercent: 25, opacity: 0 });
   gsap.set($$('[data-sticker]', h), { scale: 0, rotate: -40 });
@@ -47,12 +76,12 @@ export function heroIntro() {
     .to($$('[data-hero-echo]', h), { xPercent: (i) => (i ? -1.4 : -2.6), duration: 0.9, ease: 'elastic.out(1, 0.5)', stagger: 0.05 }, 0.85)
     .add(() => glitch(true), 1)
     // name letters smear in from the left and snap to shape
-    .to(heroChars, { xPercent: 0, scaleX: 1, opacity: 1, filter: 'blur(0px)', duration: 0.75, stagger: 0.035, ease: 'expo.out' }, 0.3)
+    .to(heroChars, { xPercent: 0, scaleX: 1, opacity: 1, duration: 0.75, stagger: 0.035, ease: 'expo.out' }, 0.3)
     .to($$('[data-hero-in]', h), { y: 0, opacity: 1, duration: 0.8, stagger: 0.07 }, 0.6)
     .to($('[data-hero-card]', h), { xPercent: 0, opacity: 1, duration: 0.9 }, 0.8)
     .to($$('[data-sticker]', h), { scale: 1, rotate: 0, duration: 0.7, ease: 'back.out(2.2)', stagger: 0.1 }, 1)
     .to($$('[data-hero-tapes] .tape'), { yPercent: 0, duration: 0.9, stagger: 0.08, ease: 'power4.out' }, 0.7)
-    .add(() => { gsap.set([$('[data-hero-main]', h), ...heroChars], { clearProps: 'filter' }); });
+    .add(() => { gsap.set($('[data-hero-main]', h), { clearProps: 'filter' }); });
   // Play the whole intro ~35% slower so each beat reads clearly.
   tl.timeScale(0.74);
   return tl;
@@ -97,12 +126,15 @@ function glitch(strong = false) {
 export function heroIdle() {
   const h = hero();
   if (!h) return;
+  // the ink layer only appears in glitch frames, so fetch it after the intro instead of up front
+  const ink = $<HTMLImageElement>('[data-hero-ink]', h);
+  if (ink?.dataset.src && !ink.src) ink.src = ink.dataset.src;
 
   // Recurring glitch while the hero is on screen.
   let visible = true;
   new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(h);
   const loop = () => {
-    gsap.delayedCall(gsap.utils.random(2.8, 5.2), () => { if (visible && !document.hidden) glitch(); loop(); });
+    gsap.delayedCall(gsap.utils.random(2.8, 5.2), () => { if (visible && !document.hidden && !h.classList.contains('is-cut')) glitch(); loop(); });
   };
   loop();
 
@@ -163,10 +195,19 @@ export function heroIdle() {
     // name letters lift and lean toward the cursor
     const pulls = heroChars.map((c) => ({ c, y: gsap.quickTo(c, 'y', { duration: 0.45, ease: 'power3.out' }), sk: gsap.quickTo(c, 'skewX', { duration: 0.45, ease: 'power3.out' }) }));
     const name = $('#hero-name', h);
-    name?.addEventListener('pointermove', (e) => {
-      pulls.forEach((p) => {
+    let centres: { x: number; y: number }[] = [];
+    name?.addEventListener('pointerenter', () => {
+      const n = name.getBoundingClientRect();
+      centres = pulls.map((p) => {
         const r = p.c.getBoundingClientRect();
-        const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+        return { x: r.left + r.width / 2 - n.left, y: r.top + r.height / 2 - n.top - (gsap.getProperty(p.c, 'y') as number) };
+      });
+    });
+    name?.addEventListener('pointermove', (e) => {
+      if (!centres.length) return;
+      const n = name.getBoundingClientRect();
+      pulls.forEach((p, i) => {
+        const dx = e.clientX - (n.left + centres[i].x), dy = e.clientY - (n.top + centres[i].y);
         const f = Math.max(0, 1 - Math.hypot(dx, dy) / 190);
         p.y(-f * f * 30);
         p.sk(-(dx / 190) * f * 20);

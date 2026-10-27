@@ -5,7 +5,7 @@
  *   dark  → lime dots, light → violet dots, volt → black dots.
  * base: "wave" (animated field, hero), "faint" (subtle static grid) or "none".
  */
-interface Props { tone: 'dark' | 'light' | 'volt'; base?: 'flow' | 'wave' | 'faint' | 'none'; z?: number }
+interface Props { tone: 'dark' | 'light' | 'volt'; base?: 'flow' | 'faint' | 'none'; z?: number }
 const { tone, base = 'faint', z = -1 } = Astro.props;
 ---
 <div class="dots" data-dots={tone} data-dots-base={base} style={`z-index:${z}`} aria-hidden="true">

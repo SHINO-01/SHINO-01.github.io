@@ -13,6 +13,7 @@ import { initSpeedLines, initWaves, initTopo } from './fx';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
+
 const root = document.documentElement;
 if (root.classList.contains('motion') && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
 const motion = root.classList.contains('motion');
