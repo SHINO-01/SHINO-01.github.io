@@ -17,7 +17,7 @@
 - role: Junior Software Engineer
   company: W3 Engineers Ltd
   location: Bangladesh
-  start: 2025-02
+  start: 2024-06
   end: 2025-05
   highlights:
     - Built and deployed a business intelligence module with Python, React and PostgreSQL, using LangGraph to speed up ad operations for the sales team.
@@ -27,8 +27,8 @@
 - role: Software Engineering Intern
   company: W3 Engineers Ltd
   location: Bangladesh
-  start: 2024-11
-  end: 2025-02
+  start: 2024-03
+  end: 2024-06
   highlights:
     - Shipped live production features in Django with senior engineering leadership, refining architecture through peer code review.
     - Built an itinerary-generation service in FastAPI that turns manual property listing forms into ready-to-publish travel content.
