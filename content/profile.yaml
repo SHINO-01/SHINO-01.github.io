@@ -13,7 +13,7 @@ codenameJp: シノ
 
 title: AI & Software Engineer
 # Rotating role chips under your name.
-roles: [AI Engineer, Software Engineer, Agent Systems Builder]
+roles: [AI Engineer, Software Engineer, Full-stack Engineer]
 
 tagline: >-
   I build multi-agent systems, verifiable AI telemetry and the
@@ -29,7 +29,7 @@ email: sakifhussain33@gmail.com
 spokenLanguages: [Bengali (native), English (C2)]
 
 # Files in /public. Replace the PDF to update your CV download.
-cv: cv/Sakif_Hussain_Resume.pdf
+cv: cv/Sakif_Hussain_CV.pdf
 portrait:
   main: agent/agent-sticker.webp   # colour cut-out with sticker outline
   ink: agent/agent-ink.webp        # same pose, ink treatment (used for glitch effects)
