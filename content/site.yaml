@@ -14,7 +14,7 @@ nav:
   contact: Contact
 
 hero:
-  fileTag: Agent file
+  fileTag: Dossier
   primaryCta: See projects
   secondaryCta: Get in touch
   sticker: hi!
@@ -26,7 +26,7 @@ loadout:
   jp: 装備
 
 missions:
-  title: Mission log
+  title: Work log
   kicker: Where I've worked and what I shipped
   jp: 任務
 
