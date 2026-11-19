@@ -12,8 +12,8 @@
 
 - name: Arcadia
   tagline: Agricultural digital twin & autonomous fleet platform
-  rank: S+
-  color: emerald
+  rank: S
+  color: cyan
   glyph: ARC
   highlights:
     - ROS 2 and C++ Webots supervisor dynamically spawn controlled-traffic farms from JSON, hot-swapping seamlessly with a headless twin over rosbridge.
@@ -60,7 +60,7 @@
 
 - name: NetZero Hub
   tagline: Microservice architecture for carbon tracking
-  rank: A
+  rank: B
   color: hazard
   glyph: NZ
   highlights:
