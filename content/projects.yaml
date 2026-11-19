@@ -10,6 +10,20 @@
 #          without one, the card generates its own artwork.
 # ─────────────────────────────────────────────────────────────
 
+- name: Arcadia
+  tagline: Agricultural digital twin & autonomous fleet platform
+  rank: S+
+  color: emerald
+  glyph: ARC
+  highlights:
+    - ROS 2 and C++ Webots supervisor dynamically spawn controlled-traffic farms from JSON, hot-swapping seamlessly with a headless twin over rosbridge.
+    - Satellite pipeline extracts farm roads via multi-scale Hessian ridge filters and Zhang-Suen thinning, driving an FAO-56 and Monte Carlo agronomic engine.
+    - FastAPI, Celery, and TimescaleDB backend fans out 5 Hz telemetry via Redis pub/sub to a React, MapLibre, and 60 fps canvas dashboard.
+  stack: [Python, C++, ROS 2, Webots, FastAPI, React, TimescaleDB, Redis, Docker]
+  links:
+    - label: GitHub
+      url: https://github.com/SHINO-01/ARCADIA
+
 - name: Tellproof
   tagline: Open-source AI telemetry & governance framework
   rank: S
